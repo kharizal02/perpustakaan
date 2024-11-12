@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'pages/login_page.dart';
 import 'pages/register_page.dart';
 import 'model/tata_tertib.dart';
+import 'pages/homepage.dart';
 
 void main() {
   runApp(MyApp());
@@ -20,6 +21,7 @@ class MyApp extends StatelessWidget {
         '/login': (context) => LoginPage(),
         '/register': (context) => RegisterPage(),
         '/tata_tertib': (context) => TataTertibPage(),
+        '/home': (context) => HomePage(),
       },
     );
   }
