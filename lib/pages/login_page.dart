@@ -14,15 +14,12 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _passwordController = TextEditingController();
   String _message = '';
 
-  // Fungsi untuk menyimpan data pengguna di SharedPreferences
   Future<void> _saveUserData(Map<String, dynamic> userData) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
-    // Menyimpan role terlebih dahulu
     await prefs.setString('role', userData['role']);
     await prefs.setString('email', userData['email']);
 
-    // Hanya menyimpan nrp, nama, dan prodi jika role adalah user
     if (userData['role'] == 'user') {
       await prefs.setString('nrp', userData['nrp']);
       await prefs.setString('nama', userData['nama']);
@@ -30,7 +27,6 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  // Fungsi login
   Future<void> _login() async {
     try {
       var uri = Uri.http(AppConfig.API_HOST, '/perpustakaan/login.php');
@@ -46,22 +42,14 @@ class _LoginPageState extends State<LoginPage> {
         var data = json.decode(response.body);
 
         if (data['success']) {
-          // Jika login berhasil, simpan data pengguna di SharedPreferences
           await _saveUserData(data['data']);
-
-          // Periksa role yang dikembalikan dari server
           String role = data['data']['role'];
-
-          // Jika role adalah 'admin', arahkan ke halaman Admin
           if (role == 'admin') {
             Navigator.pushReplacementNamed(context, '/homepageAdmin');
-          }
-          // Jika role adalah 'user', arahkan ke halaman User
-          else if (role == 'user') {
+          } else if (role == 'user') {
             Navigator.pushReplacementNamed(context, '/tata_tertib');
           }
         } else {
-          // Tampilkan dialog jika login gagal
           showDialog(
             context: context,
             builder: (BuildContext context) {
@@ -71,7 +59,7 @@ class _LoginPageState extends State<LoginPage> {
                 actions: [
                   TextButton(
                     onPressed: () {
-                      Navigator.of(context).pop(); // Tutup dialog
+                      Navigator.of(context).pop();
                     },
                     child: const Text('OK'),
                   ),
@@ -85,7 +73,6 @@ class _LoginPageState extends State<LoginPage> {
       }
     } catch (e) {
       print("Login error: $e");
-      // Tampilkan error message jika ada masalah
       showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -95,7 +82,7 @@ class _LoginPageState extends State<LoginPage> {
             actions: [
               TextButton(
                 onPressed: () {
-                  Navigator.of(context).pop(); // Tutup dialog
+                  Navigator.of(context).pop();
                 },
                 child: const Text('OK'),
               ),
@@ -111,7 +98,6 @@ class _LoginPageState extends State<LoginPage> {
     return Scaffold(
       body: Stack(
         children: [
-          // Arc di atas
           Positioned(
             top: 0,
             left: 0,
@@ -124,7 +110,6 @@ class _LoginPageState extends State<LoginPage> {
               ),
             ),
           ),
-          // Arc di bawah
           Positioned(
             bottom: 0,
             left: 0,
@@ -137,7 +122,6 @@ class _LoginPageState extends State<LoginPage> {
               ),
             ),
           ),
-          // Konten tengah
           Center(
             child: SingleChildScrollView(
               child: Padding(
@@ -161,7 +145,6 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
                     const SizedBox(height: 30),
-                    // Field Email
                     TextField(
                       controller: _emailController,
                       decoration: InputDecoration(
@@ -176,7 +159,6 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
                     const SizedBox(height: 20),
-                    // Field Password
                     TextField(
                       controller: _passwordController,
                       obscureText: true,
@@ -192,7 +174,6 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
                     const SizedBox(height: 30),
-                    // Tombol Login
                     ElevatedButton(
                       onPressed: _login,
                       style: ElevatedButton.styleFrom(
@@ -214,7 +195,6 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
                     const SizedBox(height: 20),
-                    // Tombol Sign Up
                     GestureDetector(
                       onTap: () {
                         Navigator.pushNamed(context, '/register');
@@ -240,7 +220,6 @@ class _LoginPageState extends State<LoginPage> {
   }
 }
 
-// Custom Clipper untuk Arc di atas
 class ArcClipper extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {
@@ -258,7 +237,6 @@ class ArcClipper extends CustomClipper<Path> {
   }
 }
 
-// Custom Clipper untuk Arc terbalik di bawah
 class InvertedArcClipper extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {

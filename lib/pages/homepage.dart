@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart'; // Import shared_preferences
+import 'package:perpustakaan/model/buku.dart'; // Import model BukuPage
+import 'package:perpustakaan/model/list_peminjaman.dart'; // Import model ListPeminjamanPage
 
 void main() {
   runApp(MyApp());
@@ -34,6 +36,12 @@ class MyApp extends StatelessWidget {
 }
 
 class HomePage extends StatefulWidget {
+  final int initialIndex;
+
+  HomePage(
+      {this.initialIndex =
+          0}); // Menambahkan parameter initialIndex dengan default 0
+
   @override
   _HomePageState createState() => _HomePageState();
 }
@@ -55,9 +63,8 @@ class _HomePageState extends State<HomePage> {
   List<Widget> _pages() {
     return [
       _buildHomePage(), // Home tab with custom AppBar
-      //BukuPage(), // Buku page with default AppBar (no custom changes)
-      _buildPage('Booking Buku', Colors.blue.shade100), // Other pages
-      _buildPage('List Peminjaman', Colors.blue.shade200),
+      BukuPage(), // Buku page with default AppBar (no custom changes)
+      ListPeminjamanPage(), // List Peminjaman page
     ];
   }
 
@@ -142,6 +149,8 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     _getUserData(); // Memanggil fungsi untuk mengambil data pengguna saat halaman pertama kali dibuka
+    _currentIndex =
+        widget.initialIndex; // Mengatur indeks berdasarkan parameter
   }
 
   @override

@@ -30,7 +30,6 @@ class _RegisterPageState extends State<RegisterPage> {
       _message = data['message'];
     });
 
-    // Show dialog after the registration attempt
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -40,7 +39,7 @@ class _RegisterPageState extends State<RegisterPage> {
           actions: [
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(); // Close dialog
+                Navigator.of(context).pop();
                 if (data['success']) {
                   Navigator.pushReplacementNamed(context, '/login');
                 }
@@ -58,7 +57,6 @@ class _RegisterPageState extends State<RegisterPage> {
     return Scaffold(
       body: Stack(
         children: [
-          // Top Blue Arc
           Positioned(
             top: 0,
             left: 0,
@@ -71,7 +69,6 @@ class _RegisterPageState extends State<RegisterPage> {
               ),
             ),
           ),
-          // Bottom Inverted Blue Arc
           Positioned(
             bottom: 0,
             left: 0,
@@ -84,7 +81,6 @@ class _RegisterPageState extends State<RegisterPage> {
               ),
             ),
           ),
-          // Center content
           Center(
             child: SingleChildScrollView(
               child: Padding(
@@ -108,7 +104,6 @@ class _RegisterPageState extends State<RegisterPage> {
                       ),
                     ),
                     const SizedBox(height: 30),
-                    // NRP TextField
                     TextField(
                       controller: _nrpController,
                       decoration: InputDecoration(
@@ -123,7 +118,6 @@ class _RegisterPageState extends State<RegisterPage> {
                       ),
                     ),
                     const SizedBox(height: 20),
-                    // Email TextField
                     TextField(
                       controller: _emailController,
                       decoration: InputDecoration(
@@ -138,7 +132,6 @@ class _RegisterPageState extends State<RegisterPage> {
                       ),
                     ),
                     const SizedBox(height: 20),
-                    // Password TextField
                     TextField(
                       controller: _passwordController,
                       obscureText: true,
@@ -154,7 +147,6 @@ class _RegisterPageState extends State<RegisterPage> {
                       ),
                     ),
                     const SizedBox(height: 30),
-                    // Register Button
                     ElevatedButton(
                       onPressed: _register,
                       style: ElevatedButton.styleFrom(
@@ -176,7 +168,6 @@ class _RegisterPageState extends State<RegisterPage> {
                       ),
                     ),
                     const SizedBox(height: 20),
-                    // Login Text
                     GestureDetector(
                       onTap: () {
                         Navigator.pushNamed(context, '/login');
@@ -202,7 +193,6 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 }
 
-// Custom Clipper for the Top Arc
 class ArcClipper extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {
@@ -220,7 +210,6 @@ class ArcClipper extends CustomClipper<Path> {
   }
 }
 
-// Custom Clipper for the Inverted Bottom Arc
 class InvertedArcClipper extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {

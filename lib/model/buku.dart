@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:perpustakaan/util/config/config.dart';
+import 'package:perpustakaan/model/detail_buku.dart';
+import 'package:perpustakaan/model/bandingkan_buku.dart';
 
 class BukuPage extends StatefulWidget {
   @override
@@ -17,48 +22,34 @@ class _BukuPageState extends State<BukuPage> {
     _fetchBooks(); // Ambil data buku saat halaman dimuat
   }
 
-  // Fungsi untuk mengambil data buku statis sebagai pengganti database
+  // Fungsi untuk mengambil buku berdasarkan tag pencarian
   Future<void> _fetchBooks({String? query}) async {
-    List<dynamic> dummyBooks = [
-      {
-        'id_buku': '1',
-        'judul_buku': 'Belajar Flutter',
-        'penulis': 'John Doe',
-        'tahun_terbit': '2020',
-        'status': '1',
-      },
-      {
-        'id_buku': '2',
-        'judul_buku': 'Pemrograman Dart',
-        'penulis': 'Jane Smith',
-        'tahun_terbit': '2019',
-        'status': '1',
-      },
-      {
-        'id_buku': '3',
-        'judul_buku': 'Algoritma Pemrograman',
-        'penulis': 'Alice Brown',
-        'tahun_terbit': '2018',
-        'status': '0',
-      },
-    ];
+    try {
+      var uri =
+          Uri.http(AppConfig.API_HOST, '/perpustakaan/buku/get_buku.php', {
+        'query': query ?? '',
+      });
+      final response = await http.get(uri);
 
-    setState(() {
-      _books = dummyBooks
-          .where((book) =>
-              query == null ||
-              book['judul_buku']
-                  .toLowerCase()
-                  .contains(query.toLowerCase()))
-          .toList(); // Filter data berdasarkan query
-    });
+      if (response.statusCode == 200) {
+        List<dynamic> books = json.decode(response.body);
+        setState(() {
+          _books = books; // Mengubah data buku yang diterima menjadi list
+        });
+      } else {
+        throw Exception('Gagal mengambil data buku');
+      }
+    } catch (e) {
+      print("Error fetching books: $e");
+    }
   }
 
   // Fungsi untuk mengubah status mode checkbox
   void _toggleSelectMode() {
     setState(() {
       _isSelectMode = !_isSelectMode;
-      if (!_isSelectMode) selectedBooks.clear(); // Kosongkan pilihan jika mode dimatikan
+      if (!_isSelectMode)
+        selectedBooks.clear(); // Kosongkan pilihan jika mode dimatikan
     });
   }
 
@@ -125,7 +116,8 @@ class _BukuPageState extends State<BukuPage> {
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: RefreshIndicator(
-          onRefresh: () => _fetchBooks(), // Fitur refresh ketika user pull to refresh
+          onRefresh: () =>
+              _fetchBooks(), // Fitur refresh ketika user pull to refresh
           child: _books.isEmpty
               ? Center(
                   child: Text("Tidak ada data buku",
@@ -222,48 +214,6 @@ class _BukuPageState extends State<BukuPage> {
               child: Icon(Icons.compare_arrows, color: Colors.white),
             )
           : null, // Tombol hanya muncul jika dua buku dipilih
-    );
-  }
-}
-
-class BookComparisonPage extends StatelessWidget {
-  final List<String> bookIds;
-
-  BookComparisonPage({required this.bookIds});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Perbandingan Buku'),
-      ),
-      body: Center(
-        child: Text(
-          'Perbandingan buku ID: ${bookIds[0]} dan ${bookIds[1]}',
-          style: TextStyle(fontSize: 18),
-        ),
-      ),
-    );
-  }
-}
-
-class BookDetailPage extends StatelessWidget {
-  final String bookId;
-
-  BookDetailPage({required this.bookId});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Detail Buku $bookId'),
-      ),
-      body: Center(
-        child: Text(
-          'Detail buku dengan ID: $bookId',
-          style: TextStyle(fontSize: 18),
-        ),
-      ),
     );
   }
 }
