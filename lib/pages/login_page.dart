@@ -17,9 +17,17 @@ class _LoginPageState extends State<LoginPage> {
   // Fungsi untuk menyimpan data pengguna di SharedPreferences
   Future<void> _saveUserData(Map<String, dynamic> userData) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString('nrp', userData['nrp']);
-    await prefs.setString('nama', userData['nama']);
-    await prefs.setString('prodi', userData['prodi']);
+
+    // Menyimpan role terlebih dahulu
+    await prefs.setString('role', userData['role']);
+    await prefs.setString('email', userData['email']);
+
+    // Hanya menyimpan nrp, nama, dan prodi jika role adalah user
+    if (userData['role'] == 'user') {
+      await prefs.setString('nrp', userData['nrp']);
+      await prefs.setString('nama', userData['nama']);
+      await prefs.setString('prodi', userData['prodi']);
+    }
   }
 
   // Fungsi login
@@ -41,8 +49,17 @@ class _LoginPageState extends State<LoginPage> {
           // Jika login berhasil, simpan data pengguna di SharedPreferences
           await _saveUserData(data['data']);
 
-          // Jika login sukses, arahkan ke halaman Tata Tertib
-          Navigator.pushReplacementNamed(context, '/tata_tertib');
+          // Periksa role yang dikembalikan dari server
+          String role = data['data']['role'];
+
+          // Jika role adalah 'admin', arahkan ke halaman Admin
+          if (role == 'admin') {
+            Navigator.pushReplacementNamed(context, '/homepageAdmin');
+          }
+          // Jika role adalah 'user', arahkan ke halaman User
+          else if (role == 'user') {
+            Navigator.pushReplacementNamed(context, '/tata_tertib');
+          }
         } else {
           // Tampilkan dialog jika login gagal
           showDialog(

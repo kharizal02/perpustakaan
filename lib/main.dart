@@ -3,6 +3,7 @@ import 'pages/login_page.dart';
 import 'pages/register_page.dart';
 import 'model/tata_tertib.dart';
 import 'pages/homepage.dart';
+import 'pages/homepageAdmin.dart';
 
 void main() {
   runApp(MyApp());
@@ -22,6 +23,7 @@ class MyApp extends StatelessWidget {
         '/register': (context) => RegisterPage(),
         '/tata_tertib': (context) => TataTertibPage(),
         '/home': (context) => HomePage(),
+        '/homepageAdmin': (context) => AdminHomepage(),
       },
     );
   }
