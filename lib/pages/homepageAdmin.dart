@@ -1,10 +1,8 @@
-
 import 'package:flutter/material.dart';
 import 'package:perpustakaan/admin/buku.dart';
+import 'package:perpustakaan/admin/tambahmahasiwa.dart';
 import 'package:perpustakaan/model/buku.dart';
-
-import '../admin/tambahbuku.dart';
-import '../admin/tambahmahasiwa.dart';
+import 'package:perpustakaan/admin/tambahbuku.dart';
 
 class AdminHomepage extends StatefulWidget {
   @override
@@ -87,8 +85,12 @@ class _AdminHomepageState extends State<AdminHomepage> {
               leading: const Icon(Icons.book, color: Colors.white),
               title: const Text('Buku', style: TextStyle(color: Colors.white)),
               onTap: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context)=>BukuPageAdmin(),),);
-                       
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => BukuPageAdmin(),
+                  ),
+                );
               },
             ),
             ListTile(
@@ -195,31 +197,6 @@ class _AdminHomepageState extends State<AdminHomepage> {
   }
 }
 
-// Contoh widget halaman (Anda bisa menyesuaikan halaman-halaman ini)
-<<<<<<< HEAD
-
-
-
-=======
-class BukuPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return const Center(
-      child: Text("Halaman Buku"),
-    );
-  }
-}
-
-class TambahBukuPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return const Center(
-      child: Text("Halaman Tambah Buku"),
-    );
-  }
-}
->>>>>>> 5f33bea29039c98ab6315c70392ba1a162e8905b
-
 class ListPeminjamanPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -246,19 +223,6 @@ class RiwayatPinjamPage extends StatelessWidget {
     );
   }
 }
-
-<<<<<<< HEAD
-
-=======
-class TambahMahasiswaPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return const Center(
-      child: Text("Halaman Tambah Mahasiswa"),
-    );
-  }
-}
->>>>>>> 5f33bea29039c98ab6315c70392ba1a162e8905b
 
 class DataTelatPage extends StatelessWidget {
   @override
