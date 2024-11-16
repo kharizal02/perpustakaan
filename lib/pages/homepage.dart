@@ -72,7 +72,7 @@ class _HomePageState extends State<HomePage> {
   Widget _buildHomePage() {
     return Container(
       color: Colors.grey[100],
-      padding: EdgeInsets.all(16.0),
+      padding: const EdgeInsets.all(16.0),
       child: Center(
         child: Card(
           elevation: 10.0,
@@ -81,7 +81,7 @@ class _HomePageState extends State<HomePage> {
           ),
           child: Container(
             width: double.infinity,
-            padding: EdgeInsets.all(24.0),
+            padding: const EdgeInsets.all(24.0),
             decoration: BoxDecoration(
               color: Colors.blue.shade100,
               borderRadius: BorderRadius.circular(24.0),
@@ -90,10 +90,11 @@ class _HomePageState extends State<HomePage> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Icon(Icons.home, color: Colors.blue.shade700, size: 80),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 Text(
                   'Selamat Datang, $_username', // Display the username here
-                  style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                      fontSize: 30, fontWeight: FontWeight.bold),
                   textAlign: TextAlign.center, // Center-align the text
                 ),
               ],
@@ -107,7 +108,7 @@ class _HomePageState extends State<HomePage> {
   static Widget _buildPage(String title, Color color) {
     return Container(
       color: Colors.grey[100],
-      padding: EdgeInsets.all(16.0),
+      padding: const EdgeInsets.all(16.0),
       child: Center(
         child: Card(
           elevation: 10.0,
@@ -116,7 +117,7 @@ class _HomePageState extends State<HomePage> {
           ),
           child: Container(
             width: double.infinity,
-            padding: EdgeInsets.all(24.0),
+            padding: const EdgeInsets.all(24.0),
             decoration: BoxDecoration(
               color: color,
               borderRadius: BorderRadius.circular(24.0),
@@ -126,10 +127,11 @@ class _HomePageState extends State<HomePage> {
               children: [
                 Icon(Icons.library_books,
                     color: Colors.blue.shade700, size: 60),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 Text(
                   title,
-                  style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                      fontSize: 28, fontWeight: FontWeight.bold),
                 ),
               ],
             ),
@@ -158,9 +160,10 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: _currentIndex == 0
           ? PreferredSize(
-              preferredSize: Size.fromHeight(80), // AppBar height for Home page
+              preferredSize:
+                  const Size.fromHeight(80), // AppBar height for Home page
               child: AppBar(
-                title: Text(
+                title: const Text(
                   'E-Libs',
                   style: TextStyle(
                     color: Colors.white,
@@ -178,14 +181,14 @@ class _HomePageState extends State<HomePage> {
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ),
-                    borderRadius: BorderRadius.only(
+                    borderRadius: const BorderRadius.only(
                       bottomLeft: Radius.circular(30),
                       bottomRight: Radius.circular(30),
                     ),
                   ),
                 ),
                 leading: IconButton(
-                  icon: Icon(Icons.arrow_back, color: Colors.white),
+                  icon: const Icon(Icons.arrow_back, color: Colors.white),
                   onPressed: () {
                     Navigator.pushReplacementNamed(context, '/login');
                   },
@@ -203,7 +206,7 @@ class _HomePageState extends State<HomePage> {
         type: BottomNavigationBarType.fixed,
         currentIndex: _currentIndex,
         onTap: _onItemTapped,
-        items: [
+        items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
             label: 'Home',
@@ -221,8 +224,8 @@ class _HomePageState extends State<HomePage> {
         unselectedItemColor: Colors.grey,
         backgroundColor: Colors.white,
         elevation: 12.0,
-        selectedLabelStyle: TextStyle(fontWeight: FontWeight.bold),
-        unselectedLabelStyle: TextStyle(fontWeight: FontWeight.w500),
+        selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold),
+        unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w500),
       ),
     );
   }

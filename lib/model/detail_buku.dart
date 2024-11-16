@@ -66,17 +66,17 @@ class _BookDetailPageState extends State<BookDetailPage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.blueAccent,
-        title: Text("Detail Buku"),
+        title: const Text("Detail Buku"),
       ),
       body: FutureBuilder<Map<String, dynamic>>(
         future: _bookDetail,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
-            return Center(child: Text("Terjadi kesalahan"));
+            return const Center(child: Text("Terjadi kesalahan"));
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(child: Text("Buku tidak ditemukan"));
+            return const Center(child: Text("Buku tidak ditemukan"));
           }
 
           var book = snapshot.data!;
@@ -103,18 +103,18 @@ class _BookDetailPageState extends State<BookDetailPage> {
                             ),
                           ),
                         ),
-                        SizedBox(height: 20),
+                        const SizedBox(height: 20),
 
                         // Judul Buku
                         Text(
                           book['judul_buku'],
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 26,
                             fontWeight: FontWeight.bold,
                             color: Colors.blueAccent,
                           ),
                         ),
-                        SizedBox(height: 10),
+                        const SizedBox(height: 10),
 
                         // Penulis dan Prodi
                         Text(
@@ -122,19 +122,19 @@ class _BookDetailPageState extends State<BookDetailPage> {
                           style:
                               TextStyle(fontSize: 18, color: Colors.grey[700]),
                         ),
-                        SizedBox(height: 5),
+                        const SizedBox(height: 5),
                         Text(
                           'Prodi: ${book['prodi']}',
                           style:
                               TextStyle(fontSize: 18, color: Colors.grey[700]),
                         ),
-                        SizedBox(height: 5),
+                        const SizedBox(height: 5),
                         Text(
                           'Tahun Terbit: ${book['tahun_terbit']}',
                           style:
                               TextStyle(fontSize: 18, color: Colors.grey[700]),
                         ),
-                        SizedBox(height: 10),
+                        const SizedBox(height: 10),
 
                         // Jumlah Halaman
                         Text(
@@ -142,7 +142,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
                           style:
                               TextStyle(fontSize: 18, color: Colors.grey[700]),
                         ),
-                        SizedBox(height: 15),
+                        const SizedBox(height: 15),
 
                         // Tag Buku
                         Text(
@@ -150,7 +150,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
                           style:
                               TextStyle(fontSize: 18, color: Colors.grey[700]),
                         ),
-                        SizedBox(height: 20),
+                        const SizedBox(height: 20),
 
                         // Status Buku
                         Row(
@@ -163,7 +163,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
                                   ? Colors.green
                                   : Colors.red,
                             ),
-                            SizedBox(width: 10),
+                            const SizedBox(width: 10),
                             Text(
                               'Status: ${book['status'] == '1' ? 'Tersedia' : 'Dipinjam'}',
                               style: TextStyle(
@@ -176,11 +176,11 @@ class _BookDetailPageState extends State<BookDetailPage> {
                             ),
                           ],
                         ),
-                        SizedBox(height: 20),
+                        const SizedBox(height: 20),
 
                         // Deskripsi
                         Container(
-                          padding: EdgeInsets.all(16),
+                          padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
                             color: Colors.grey[200],
                             borderRadius: BorderRadius.circular(10),
@@ -188,12 +188,12 @@ class _BookDetailPageState extends State<BookDetailPage> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
+                              const Text(
                                 'Deskripsi:',
                                 style: TextStyle(
                                     fontSize: 20, fontWeight: FontWeight.bold),
                               ),
-                              SizedBox(height: 10),
+                              const SizedBox(height: 10),
                               SizedBox(
                                 height: 150,
                                 child: SingleChildScrollView(
@@ -214,7 +214,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
                     ),
                   ),
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 // Tombol Booking
                 ElevatedButton(
                   onPressed: () {
@@ -229,12 +229,12 @@ class _BookDetailPageState extends State<BookDetailPage> {
                       borderRadius: BorderRadius.circular(
                           15), // Membuat sudut tombol melengkung
                     ),
-                    padding: EdgeInsets.symmetric(
+                    padding: const EdgeInsets.symmetric(
                         vertical: 12,
                         horizontal:
                             24), // Menambah padding untuk ukuran tombol lebih besar
                   ),
-                  child: Text(
+                  child: const Text(
                     'Booking Buku',
                     style: TextStyle(
                       fontSize:

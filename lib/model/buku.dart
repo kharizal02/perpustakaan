@@ -92,10 +92,10 @@ class _BukuPageState extends State<BukuPage> {
           },
           decoration: InputDecoration(
             hintText: 'Cari Buku ',
-            prefixIcon: Icon(Icons.search, color: Colors.white),
+            prefixIcon: const Icon(Icons.search, color: Colors.white),
             filled: true,
             fillColor: Colors.white70,
-            contentPadding: EdgeInsets.symmetric(vertical: 10.0),
+            contentPadding: const EdgeInsets.symmetric(vertical: 10.0),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(30),
               borderSide: BorderSide.none,
@@ -119,7 +119,7 @@ class _BukuPageState extends State<BukuPage> {
           onRefresh: () =>
               _fetchBooks(), // Fitur refresh ketika user pull to refresh
           child: _books.isEmpty
-              ? Center(
+              ? const Center(
                   child: Text("Tidak ada data buku",
                       style: TextStyle(fontSize: 18, color: Colors.grey)))
               : ListView.builder(
@@ -137,7 +137,7 @@ class _BukuPageState extends State<BukuPage> {
                       elevation: 3,
                       margin: const EdgeInsets.symmetric(vertical: 8.0),
                       child: ListTile(
-                        contentPadding: EdgeInsets.all(16),
+                        contentPadding: const EdgeInsets.all(16),
                         leading: _isSelectMode
                             ? Checkbox(
                                 value: isSelected,
@@ -148,7 +148,7 @@ class _BukuPageState extends State<BukuPage> {
                             : null,
                         title: Text(
                           book['judul_buku'],
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
                             color: Colors.blueAccent,
@@ -162,13 +162,13 @@ class _BukuPageState extends State<BukuPage> {
                               style: TextStyle(
                                   fontSize: 14, color: Colors.grey[600]),
                             ),
-                            SizedBox(height: 5),
+                            const SizedBox(height: 5),
                             Text(
                               'Tahun Terbit: ${book['tahun_terbit']}',
                               style: TextStyle(
                                   fontSize: 14, color: Colors.grey[600]),
                             ),
-                            SizedBox(height: 5),
+                            const SizedBox(height: 5),
                             Text(
                               'Status: ${book['status'] == '1' ? 'Tersedia' : 'Dipinjam'}',
                               style: TextStyle(
@@ -211,7 +211,7 @@ class _BukuPageState extends State<BukuPage> {
           ? FloatingActionButton(
               onPressed: _compareBooks,
               backgroundColor: Colors.red,
-              child: Icon(Icons.compare_arrows, color: Colors.white),
+              child: const Icon(Icons.compare_arrows, color: Colors.white),
             )
           : null, // Tombol hanya muncul jika dua buku dipilih
     );
