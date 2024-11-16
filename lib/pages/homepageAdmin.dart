@@ -47,7 +47,7 @@ class _AdminHomepageState extends State<AdminHomepage> {
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
-            borderRadius: BorderRadius.only(
+            borderRadius: const BorderRadius.only(
               bottomLeft: Radius.circular(40),
               bottomRight: Radius.circular(40),
             ),
@@ -60,7 +60,7 @@ class _AdminHomepageState extends State<AdminHomepage> {
           padding: EdgeInsets.zero,
           children: <Widget>[
             // Header drawer dengan gambar atau nama
-            UserAccountsDrawerHeader(
+            const UserAccountsDrawerHeader(
               accountName: Text('Admin', style: TextStyle(color: Colors.white)),
               accountEmail: Text('admin@example.com',
                   style: TextStyle(color: Colors.white)),
@@ -78,8 +78,8 @@ class _AdminHomepageState extends State<AdminHomepage> {
             ),
             // Menu items dalam Drawer
             ListTile(
-              leading: Icon(Icons.book, color: Colors.white),
-              title: Text('Buku', style: TextStyle(color: Colors.white)),
+              leading: const Icon(Icons.book, color: Colors.white),
+              title: const Text('Buku', style: TextStyle(color: Colors.white)),
               onTap: () {
                 setState(() {
                   _selectedIndex = 0;
@@ -88,8 +88,9 @@ class _AdminHomepageState extends State<AdminHomepage> {
               },
             ),
             ListTile(
-              leading: Icon(Icons.add_box, color: Colors.white),
-              title: Text('Tambah Buku', style: TextStyle(color: Colors.white)),
+              leading: const Icon(Icons.add_box, color: Colors.white),
+              title: const Text('Tambah Buku',
+                  style: TextStyle(color: Colors.white)),
               onTap: () {
                 setState(() {
                   _selectedIndex = 1;
@@ -98,8 +99,8 @@ class _AdminHomepageState extends State<AdminHomepage> {
               },
             ),
             ListTile(
-              leading: Icon(Icons.list, color: Colors.white),
-              title: Text('List Peminjaman',
+              leading: const Icon(Icons.list, color: Colors.white),
+              title: const Text('List Peminjaman',
                   style: TextStyle(color: Colors.white)),
               onTap: () {
                 setState(() {
@@ -109,8 +110,9 @@ class _AdminHomepageState extends State<AdminHomepage> {
               },
             ),
             ListTile(
-              leading: Icon(Icons.people, color: Colors.white),
-              title: Text('Mahasiswa', style: TextStyle(color: Colors.white)),
+              leading: const Icon(Icons.people, color: Colors.white),
+              title: const Text('Mahasiswa',
+                  style: TextStyle(color: Colors.white)),
               onTap: () {
                 setState(() {
                   _selectedIndex = 3;
@@ -119,9 +121,9 @@ class _AdminHomepageState extends State<AdminHomepage> {
               },
             ),
             ListTile(
-              leading: Icon(Icons.history, color: Colors.white),
-              title:
-                  Text('Riwayat Pinjam', style: TextStyle(color: Colors.white)),
+              leading: const Icon(Icons.history, color: Colors.white),
+              title: const Text('Riwayat Pinjam',
+                  style: TextStyle(color: Colors.white)),
               onTap: () {
                 setState(() {
                   _selectedIndex = 4;
@@ -130,8 +132,8 @@ class _AdminHomepageState extends State<AdminHomepage> {
               },
             ),
             ListTile(
-              leading: Icon(Icons.person_add, color: Colors.white),
-              title: Text('Tambah Mahasiswa',
+              leading: const Icon(Icons.person_add, color: Colors.white),
+              title: const Text('Tambah Mahasiswa',
                   style: TextStyle(color: Colors.white)),
               onTap: () {
                 setState(() {
@@ -141,8 +143,9 @@ class _AdminHomepageState extends State<AdminHomepage> {
               },
             ),
             ListTile(
-              leading: Icon(Icons.report_problem, color: Colors.white),
-              title: Text('Data Telat', style: TextStyle(color: Colors.white)),
+              leading: const Icon(Icons.report_problem, color: Colors.white),
+              title: const Text('Data Telat',
+                  style: TextStyle(color: Colors.white)),
               onTap: () {
                 setState(() {
                   _selectedIndex = 6;
@@ -151,9 +154,9 @@ class _AdminHomepageState extends State<AdminHomepage> {
               },
             ),
             ListTile(
-              leading: Icon(Icons.update, color: Colors.white),
-              title:
-                  Text('Perpanjangan', style: TextStyle(color: Colors.white)),
+              leading: const Icon(Icons.update, color: Colors.white),
+              title: const Text('Perpanjangan',
+                  style: TextStyle(color: Colors.white)),
               onTap: () {
                 setState(() {
                   _selectedIndex = 7;
@@ -162,13 +165,13 @@ class _AdminHomepageState extends State<AdminHomepage> {
               },
             ),
             // Menu Log Out
-            Divider(),
+            const Divider(),
             MouseRegion(
               onEnter: (_) => setState(() {}),
               onExit: (_) => setState(() {}),
               child: ListTile(
-                leading: Icon(Icons.exit_to_app, color: Colors.white),
-                title: Text(
+                leading: const Icon(Icons.exit_to_app, color: Colors.white),
+                title: const Text(
                   'Keluar',
                   style: TextStyle(
                       color: Colors.red), // Warna merah untuk "Keluar"
@@ -192,7 +195,7 @@ class _AdminHomepageState extends State<AdminHomepage> {
 class BukuPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Center(
+    return const Center(
       child: Text("Halaman Buku"),
     );
   }
@@ -201,7 +204,7 @@ class BukuPage extends StatelessWidget {
 class TambahBukuPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Center(
+    return const Center(
       child: Text("Halaman Tambah Buku"),
     );
   }
@@ -210,7 +213,7 @@ class TambahBukuPage extends StatelessWidget {
 class ListPeminjamanPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Center(
+    return const Center(
       child: Text("Halaman List Peminjaman"),
     );
   }
@@ -219,7 +222,7 @@ class ListPeminjamanPage extends StatelessWidget {
 class MahasiswaPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Center(
+    return const Center(
       child: Text("Halaman Mahasiswa"),
     );
   }
@@ -228,7 +231,7 @@ class MahasiswaPage extends StatelessWidget {
 class RiwayatPinjamPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Center(
+    return const Center(
       child: Text("Halaman Riwayat Pinjam"),
     );
   }
@@ -237,7 +240,7 @@ class RiwayatPinjamPage extends StatelessWidget {
 class TambahMahasiswaPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Center(
+    return const Center(
       child: Text("Halaman Tambah Mahasiswa"),
     );
   }
@@ -246,7 +249,7 @@ class TambahMahasiswaPage extends StatelessWidget {
 class DataTelatPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Center(
+    return const Center(
       child: Text("Halaman Data Telat"),
     );
   }
@@ -255,7 +258,7 @@ class DataTelatPage extends StatelessWidget {
 class PerpanjanganPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Center(
+    return const Center(
       child: Text("Halaman Perpanjangan"),
     );
   }

@@ -52,7 +52,7 @@ class _BookComparisonPageState extends State<BookComparisonPage> {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(15),
         ),
-        margin: EdgeInsets.symmetric(vertical: 10),
+        margin: const EdgeInsets.symmetric(vertical: 10),
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: SingleChildScrollView(
@@ -74,49 +74,49 @@ class _BookComparisonPageState extends State<BookComparisonPage> {
                     ),
                   ),
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
 
                 // Judul Buku
                 Text(
                   book['judul_buku'],
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 26,
                     fontWeight: FontWeight.bold,
                     color: Colors.blueAccent,
                   ),
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
 
                 // Penulis dan Prodi
                 Text(
                   'Penulis: ${book['penulis']}',
                   style: TextStyle(fontSize: 18, color: Colors.grey[700]),
                 ),
-                SizedBox(height: 5),
+                const SizedBox(height: 5),
                 Text(
                   'Prodi: ${book['prodi']}',
                   style: TextStyle(fontSize: 18, color: Colors.grey[700]),
                 ),
-                SizedBox(height: 5),
+                const SizedBox(height: 5),
                 Text(
                   'Tahun Terbit: ${book['tahun_terbit']}',
                   style: TextStyle(fontSize: 18, color: Colors.grey[700]),
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
 
                 // Jumlah Halaman
                 Text(
                   'Jumlah Halaman: ${book['jumlah_halaman']}',
                   style: TextStyle(fontSize: 18, color: Colors.grey[700]),
                 ),
-                SizedBox(height: 15),
+                const SizedBox(height: 15),
 
                 // Tag Buku
                 Text(
                   'Tag: ${book['tag']}',
                   style: TextStyle(fontSize: 18, color: Colors.grey[700]),
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
 
                 // Status Buku
                 Row(
@@ -125,7 +125,7 @@ class _BookComparisonPageState extends State<BookComparisonPage> {
                       book['status'] == '1' ? Icons.check_circle : Icons.cancel,
                       color: book['status'] == '1' ? Colors.green : Colors.red,
                     ),
-                    SizedBox(width: 10),
+                    const SizedBox(width: 10),
                     Text(
                       'Status: ${book['status'] == '1' ? 'Tersedia' : 'Dipinjam'}',
                       style: TextStyle(
@@ -137,11 +137,11 @@ class _BookComparisonPageState extends State<BookComparisonPage> {
                     ),
                   ],
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
 
                 // Deskripsi
                 Container(
-                  padding: EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     color: Colors.grey[200],
                     borderRadius: BorderRadius.circular(10),
@@ -149,12 +149,12 @@ class _BookComparisonPageState extends State<BookComparisonPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
+                      const Text(
                         'Deskripsi:',
                         style: TextStyle(
                             fontSize: 20, fontWeight: FontWeight.bold),
                       ),
-                      SizedBox(height: 10),
+                      const SizedBox(height: 10),
                       Text(
                         book['deskripsi'] ?? 'Deskripsi tidak tersedia.',
                         style: TextStyle(fontSize: 16, color: Colors.grey[700]),
@@ -175,17 +175,17 @@ class _BookComparisonPageState extends State<BookComparisonPage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.blueAccent,
-        title: Text("Perbandingan Buku"),
+        title: const Text("Perbandingan Buku"),
       ),
       body: books.isEmpty
-          ? Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator())
           : (books.length < 2
-              ? Center(child: Text("Perbandingan membutuhkan 2 buku!"))
+              ? const Center(child: Text("Perbandingan membutuhkan 2 buku!"))
               : Column(
                   children: [
                     // Buku 1
                     _buildBookCard(books[0]),
-                    SizedBox(height: 16),
+                    const SizedBox(height: 16),
 
                     // Buku 2
                     _buildBookCard(books[1]),

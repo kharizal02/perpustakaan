@@ -10,7 +10,11 @@ class BookingPage extends StatefulWidget {
   final String nama;
   final String judulBuku;
 
-  BookingPage({required this.nrp, required this.nama, required this.judulBuku});
+  const BookingPage(
+      {super.key,
+      required this.nrp,
+      required this.nama,
+      required this.judulBuku});
 
   @override
   _BookingPageState createState() => _BookingPageState();
@@ -22,8 +26,8 @@ class _BookingPageState extends State<BookingPage> {
   // Fungsi untuk melakukan pemesanan buku
   Future<void> _bookBuku() async {
     final bookingDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
-    final returnDate =
-        DateFormat('yyyy-MM-dd').format(DateTime.now().add(Duration(days: 14)));
+    final returnDate = DateFormat('yyyy-MM-dd')
+        .format(DateTime.now().add(const Duration(days: 14)));
 
     try {
       var uri = Uri.http(AppConfig.API_HOST, '/perpustakaan/buku/booking.php');
@@ -57,7 +61,7 @@ class _BookingPageState extends State<BookingPage> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        duration: Duration(seconds: 3),
+        duration: const Duration(seconds: 3),
       ),
     );
   }
@@ -68,7 +72,7 @@ class _BookingPageState extends State<BookingPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text("Pemberitahuan"),
+          title: const Text("Pemberitahuan"),
           content: Text(message),
           actions: <Widget>[
             TextButton(
@@ -85,7 +89,7 @@ class _BookingPageState extends State<BookingPage> {
                   );
                 }
               },
-              child: Text("OK"),
+              child: const Text("OK"),
             ),
           ],
         );
@@ -96,18 +100,18 @@ class _BookingPageState extends State<BookingPage> {
   @override
   Widget build(BuildContext context) {
     final bookingDate = DateFormat('dd-MM-yyyy').format(DateTime.now());
-    final returnDate =
-        DateFormat('dd-MM-yyyy').format(DateTime.now().add(Duration(days: 14)));
+    final returnDate = DateFormat('dd-MM-yyyy')
+        .format(DateTime.now().add(const Duration(days: 14)));
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("Booking Buku"),
+        title: const Text("Booking Buku"),
         backgroundColor: Colors.blueAccent,
       ),
       body: Center(
         child: Container(
-          padding: EdgeInsets.all(20),
-          margin: EdgeInsets.all(16),
+          padding: const EdgeInsets.all(20),
+          margin: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(16),
@@ -115,7 +119,7 @@ class _BookingPageState extends State<BookingPage> {
               BoxShadow(
                 color: Colors.blueAccent.withOpacity(0.1),
                 blurRadius: 10,
-                offset: Offset(0, 4),
+                offset: const Offset(0, 4),
               ),
             ],
           ),
@@ -124,45 +128,47 @@ class _BookingPageState extends State<BookingPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Informasi Pengguna
-                Text(
+                const Text(
                   'Informasi Pengguna',
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                Divider(thickness: 1),
-                SizedBox(height: 10),
-                Text('NRP: ${widget.nrp}', style: TextStyle(fontSize: 18)),
-                Text('Nama: ${widget.nama}', style: TextStyle(fontSize: 18)),
-                SizedBox(height: 20),
+                const Divider(thickness: 1),
+                const SizedBox(height: 10),
+                Text('NRP: ${widget.nrp}',
+                    style: const TextStyle(fontSize: 18)),
+                Text('Nama: ${widget.nama}',
+                    style: const TextStyle(fontSize: 18)),
+                const SizedBox(height: 20),
 
                 // Informasi Buku
-                Text(
+                const Text(
                   'Informasi Buku',
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                Divider(thickness: 1),
-                SizedBox(height: 10),
+                const Divider(thickness: 1),
+                const SizedBox(height: 10),
                 Text('Judul Buku: ${widget.judulBuku}'),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
 
                 // Tanggal Booking & Pengembalian
-                Text(
+                const Text(
                   'Tanggal Booking & Pengembalian',
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                Divider(thickness: 1),
-                SizedBox(height: 10),
+                const Divider(thickness: 1),
+                const SizedBox(height: 10),
                 Text('Tanggal Booking: $bookingDate'),
                 Text('Tanggal Pengembalian: $returnDate'),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
 
                 // Persetujuan Tata Tertib
                 Row(
@@ -175,7 +181,7 @@ class _BookingPageState extends State<BookingPage> {
                         });
                       },
                     ),
-                    Expanded(
+                    const Expanded(
                       child: Text(
                         'Setuju dengan Tata Tertib Peminjaman?',
                         style: TextStyle(
@@ -186,22 +192,22 @@ class _BookingPageState extends State<BookingPage> {
                     ),
                   ],
                 ),
-                SizedBox(height: 30),
+                const SizedBox(height: 30),
 
                 // Tombol Booking
                 Center(
                   child: ElevatedButton(
                     onPressed: _isChecked ? _bookBuku : null,
                     style: ElevatedButton.styleFrom(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 40, vertical: 15),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30),
                       ),
                       backgroundColor: Colors.blueAccent,
                       foregroundColor: Colors.white,
                     ),
-                    child: Text(
+                    child: const Text(
                       'Booking Sekarang',
                       style:
                           TextStyle(fontSize: 18, fontWeight: FontWeight.bold),

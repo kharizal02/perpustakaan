@@ -44,7 +44,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   Navigator.pushReplacementNamed(context, '/login');
                 }
               },
-              child: Text('OK'),
+              child: const Text('OK'),
             ),
           ],
         );
