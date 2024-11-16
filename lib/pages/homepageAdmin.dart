@@ -1,4 +1,10 @@
+
 import 'package:flutter/material.dart';
+import 'package:perpustakaan/admin/buku.dart';
+import 'package:perpustakaan/model/buku.dart';
+
+import '../admin/tambahbuku.dart';
+import '../admin/tambahmahasiwa.dart';
 
 class AdminHomepage extends StatefulWidget {
   @override
@@ -15,7 +21,7 @@ class _AdminHomepageState extends State<AdminHomepage> {
     ListPeminjamanPage(), // Halaman List Peminjaman
     MahasiswaPage(), // Halaman Mahasiswa
     RiwayatPinjamPage(), // Halaman Riwayat Pinjam
-    TambahMahasiswaPage(), // Halaman Tambah Mahasiswa
+    AddMahasiswaForm(), // Halaman Tambah Mahasiswa
     DataTelatPage(), // Halaman Data Telat
     PerpanjanganPage(), // Halaman Perpanjangan
   ];
@@ -81,10 +87,8 @@ class _AdminHomepageState extends State<AdminHomepage> {
               leading: Icon(Icons.book, color: Colors.white),
               title: Text('Buku', style: TextStyle(color: Colors.white)),
               onTap: () {
-                setState(() {
-                  _selectedIndex = 0;
-                });
-                Navigator.pop(context); // Menutup drawer setelah menu dipilih
+                Navigator.push(context, MaterialPageRoute(builder: (context)=>BukuPageAdmin(),),);
+                       
               },
             ),
             ListTile(
@@ -189,23 +193,9 @@ class _AdminHomepageState extends State<AdminHomepage> {
 }
 
 // Contoh widget halaman (Anda bisa menyesuaikan halaman-halaman ini)
-class BukuPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Text("Halaman Buku"),
-    );
-  }
-}
 
-class TambahBukuPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Text("Halaman Tambah Buku"),
-    );
-  }
-}
+
+
 
 class ListPeminjamanPage extends StatelessWidget {
   @override
@@ -234,14 +224,7 @@ class RiwayatPinjamPage extends StatelessWidget {
   }
 }
 
-class TambahMahasiswaPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Text("Halaman Tambah Mahasiswa"),
-    );
-  }
-}
+
 
 class DataTelatPage extends StatelessWidget {
   @override
