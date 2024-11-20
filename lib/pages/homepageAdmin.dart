@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:perpustakaan/admin/buku.dart';
 import 'package:perpustakaan/admin/tambahmahasiwa.dart';
-import 'package:perpustakaan/model/buku.dart';
 import 'package:perpustakaan/admin/tambahbuku.dart';
 
 class AdminHomepage extends StatefulWidget {
@@ -14,7 +13,7 @@ class _AdminHomepageState extends State<AdminHomepage> {
 
   // Daftar widget untuk setiap menu
   final List<Widget> _pages = [
-    BukuPage(), // Halaman Buku
+    BukuPageAdmin(), // Halaman Buku
     TambahBukuPage(), // Halaman Tambah Buku
     ListPeminjamanPage(), // Halaman List Peminjaman
     MahasiswaPage(), // Halaman Mahasiswa
@@ -24,6 +23,13 @@ class _AdminHomepageState extends State<AdminHomepage> {
     PerpanjanganPage(), // Halaman Perpanjangan
   ];
 
+  void _onMenuSelected(int index) {
+    setState(() {
+      _selectedIndex = index; // Ganti index saat menu dipilih
+    });
+    Navigator.pop(context); // Tutup drawer setelah memilih menu
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -31,14 +37,14 @@ class _AdminHomepageState extends State<AdminHomepage> {
         title: const Text(
           'E-Libs',
           style: TextStyle(
-            color: Colors.white, // Warna teks putih
-            fontSize: 24, // Ukuran font
-            fontWeight: FontWeight.bold, // Tebal
+            color: Colors.white,
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
             shadows: [
               BoxShadow(
-                color: Colors.black54, // Warna bayangan
-                offset: Offset(2, 2), // Posisi bayangan
-                blurRadius: 4, // Ukuran bayangan
+                color: Colors.black54,
+                offset: Offset(2, 2),
+                blurRadius: 4,
               ),
             ],
           ),
@@ -63,7 +69,6 @@ class _AdminHomepageState extends State<AdminHomepage> {
         child: ListView(
           padding: EdgeInsets.zero,
           children: <Widget>[
-            // Header drawer dengan gambar atau nama
             const UserAccountsDrawerHeader(
               accountName: Text('Admin', style: TextStyle(color: Colors.white)),
               accountEmail: Text('admin@example.com',
@@ -80,119 +85,71 @@ class _AdminHomepageState extends State<AdminHomepage> {
                 ),
               ),
             ),
-            // Menu items dalam Drawer
             ListTile(
               leading: const Icon(Icons.book, color: Colors.white),
               title: const Text('Buku', style: TextStyle(color: Colors.white)),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => BukuPageAdmin(),
-                  ),
-                );
-              },
+              onTap: () => _onMenuSelected(0),
             ),
             ListTile(
               leading: const Icon(Icons.add_box, color: Colors.white),
               title: const Text('Tambah Buku',
                   style: TextStyle(color: Colors.white)),
-              onTap: () {
-                setState(() {
-                  _selectedIndex = 1;
-                });
-                Navigator.pop(context); // Menutup drawer setelah menu dipilih
-              },
+              onTap: () => _onMenuSelected(1),
             ),
             ListTile(
               leading: const Icon(Icons.list, color: Colors.white),
               title: const Text('List Peminjaman',
                   style: TextStyle(color: Colors.white)),
-              onTap: () {
-                setState(() {
-                  _selectedIndex = 2;
-                });
-                Navigator.pop(context); // Menutup drawer setelah menu dipilih
-              },
+              onTap: () => _onMenuSelected(2),
             ),
             ListTile(
               leading: const Icon(Icons.people, color: Colors.white),
               title: const Text('Mahasiswa',
                   style: TextStyle(color: Colors.white)),
-              onTap: () {
-                setState(() {
-                  _selectedIndex = 3;
-                });
-                Navigator.pop(context); // Menutup drawer setelah menu dipilih
-              },
+              onTap: () => _onMenuSelected(3),
             ),
             ListTile(
               leading: const Icon(Icons.history, color: Colors.white),
               title: const Text('Riwayat Pinjam',
                   style: TextStyle(color: Colors.white)),
-              onTap: () {
-                setState(() {
-                  _selectedIndex = 4;
-                });
-                Navigator.pop(context); // Menutup drawer setelah menu dipilih
-              },
+              onTap: () => _onMenuSelected(4),
             ),
             ListTile(
               leading: const Icon(Icons.person_add, color: Colors.white),
               title: const Text('Tambah Mahasiswa',
                   style: TextStyle(color: Colors.white)),
-              onTap: () {
-                setState(() {
-                  _selectedIndex = 5;
-                });
-                Navigator.pop(context); // Menutup drawer setelah menu dipilih
-              },
+              onTap: () => _onMenuSelected(5),
             ),
             ListTile(
               leading: const Icon(Icons.report_problem, color: Colors.white),
               title: const Text('Data Telat',
                   style: TextStyle(color: Colors.white)),
-              onTap: () {
-                setState(() {
-                  _selectedIndex = 6;
-                });
-                Navigator.pop(context); // Menutup drawer setelah menu dipilih
-              },
+              onTap: () => _onMenuSelected(6),
             ),
             ListTile(
               leading: const Icon(Icons.update, color: Colors.white),
               title: const Text('Perpanjangan',
                   style: TextStyle(color: Colors.white)),
-              onTap: () {
-                setState(() {
-                  _selectedIndex = 7;
-                });
-                Navigator.pop(context); // Menutup drawer setelah menu dipilih
-              },
+              onTap: () => _onMenuSelected(7),
             ),
-            // Menu Log Out
             const Divider(),
-            MouseRegion(
-              onEnter: (_) => setState(() {}),
-              onExit: (_) => setState(() {}),
-              child: ListTile(
-                leading: const Icon(Icons.exit_to_app, color: Colors.white),
-                title: const Text(
-                  'Keluar',
-                  style: TextStyle(
-                      color: Colors.red), // Warna merah untuk "Keluar"
-                ),
-                onTap: () {
-                  Navigator.pushReplacementNamed(
-                      context, '/login'); // Arahkan ke halaman login
-                },
+            ListTile(
+              leading: const Icon(Icons.exit_to_app, color: Colors.white),
+              title: const Text(
+                'Keluar',
+                style: TextStyle(color: Colors.red),
               ),
+              onTap: () {
+                Navigator.pushReplacementNamed(context, '/login');
+              },
             ),
           ],
         ),
       ),
-      body: _pages[
-          _selectedIndex], // Menampilkan halaman berdasarkan index yang dipilih
+      body: IndexedStack(
+        index: _selectedIndex,
+        children: _pages,
+      ),
     );
   }
 }

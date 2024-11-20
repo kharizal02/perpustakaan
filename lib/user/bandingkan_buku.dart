@@ -122,17 +122,23 @@ class _BookComparisonPageState extends State<BookComparisonPage> {
                 Row(
                   children: [
                     Icon(
-                      book['status'] == '1' ? Icons.check_circle : Icons.cancel,
-                      color: book['status'] == '1' ? Colors.green : Colors.red,
+                      book['status'].toLowerCase() ==
+                              'tersedia' // Cek jika status 'tersedia'
+                          ? Icons.check_circle
+                          : Icons.cancel,
+                      color: book['status'].toLowerCase() == 'tersedia'
+                          ? Colors.green
+                          : Colors.red,
                     ),
                     const SizedBox(width: 10),
                     Text(
-                      'Status: ${book['status'] == '1' ? 'Tersedia' : 'Dipinjam'}',
+                      'Status: ${book['status'].toLowerCase() == 'tersedia' ? 'Tersedia' : 'Dipinjam'}',
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color:
-                            book['status'] == '1' ? Colors.green : Colors.red,
+                        color: book['status'].toLowerCase() == 'tersedia'
+                            ? Colors.green
+                            : Colors.red,
                       ),
                     ),
                   ],

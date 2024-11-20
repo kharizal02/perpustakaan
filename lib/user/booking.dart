@@ -10,11 +10,12 @@ class BookingPage extends StatefulWidget {
   final String nama;
   final String judulBuku;
 
-  const BookingPage(
-      {super.key,
-      required this.nrp,
-      required this.nama,
-      required this.judulBuku});
+  const BookingPage({
+    super.key,
+    required this.nrp,
+    required this.nama,
+    required this.judulBuku,
+  });
 
   @override
   _BookingPageState createState() => _BookingPageState();
@@ -22,12 +23,30 @@ class BookingPage extends StatefulWidget {
 
 class _BookingPageState extends State<BookingPage> {
   bool _isChecked = false; // Persetujuan tata tertib
+  DateTime? _selectedReturnDate; // Tanggal pengembalian yang dipilih pengguna
+  final DateTime _maxReturnDate = DateTime.now()
+      .add(const Duration(days: 14)); // Batas maksimal tanggal pengembalian
+
+  // Fungsi untuk memilih tanggal pengembalian
+  Future<void> _selectReturnDate(BuildContext context) async {
+    final DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime.now(),
+      lastDate: _maxReturnDate,
+    );
+
+    if (pickedDate != null && pickedDate != _selectedReturnDate) {
+      setState(() {
+        _selectedReturnDate = pickedDate;
+      });
+    }
+  }
 
   // Fungsi untuk melakukan pemesanan buku
   Future<void> _bookBuku() async {
     final bookingDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
-    final returnDate = DateFormat('yyyy-MM-dd')
-        .format(DateTime.now().add(const Duration(days: 14)));
+    final returnDate = DateFormat('yyyy-MM-dd').format(_selectedReturnDate!);
 
     try {
       var uri = Uri.http(AppConfig.API_HOST, '/perpustakaan/buku/booking.php');
@@ -44,19 +63,15 @@ class _BookingPageState extends State<BookingPage> {
       var data = json.decode(response.body);
 
       if (data['status'] == 'success') {
-        // Menampilkan dialog saat booking berhasil
         _showDialog(data['message'], true);
       } else {
-        // Menampilkan dialog jika gagal
         _showDialog(data['message'], false);
       }
     } catch (e) {
-      // Menampilkan pesan error jika terjadi masalah dengan koneksi atau lainnya
       _showSnackbar("Terjadi kesalahan: $e");
     }
   }
 
-  // Fungsi untuk menampilkan SnackBar
   void _showSnackbar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -66,7 +81,6 @@ class _BookingPageState extends State<BookingPage> {
     );
   }
 
-  // Fungsi untuk menampilkan Dialog
   void _showDialog(String message, bool isSuccess) {
     showDialog(
       context: context,
@@ -77,14 +91,12 @@ class _BookingPageState extends State<BookingPage> {
           actions: <Widget>[
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(); // Tutup dialog
+                Navigator.of(context).pop();
                 if (isSuccess) {
-                  // Jika booking berhasil, arahkan ke HomePage dan langsung ke tab List Peminjaman
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => HomePage(
-                          initialIndex: 2), // Tab List Peminjaman (index 2)
+                      builder: (context) => HomePage(initialIndex: 2),
                     ),
                   );
                 }
@@ -100,8 +112,6 @@ class _BookingPageState extends State<BookingPage> {
   @override
   Widget build(BuildContext context) {
     final bookingDate = DateFormat('dd-MM-yyyy').format(DateTime.now());
-    final returnDate = DateFormat('dd-MM-yyyy')
-        .format(DateTime.now().add(const Duration(days: 14)));
 
     return Scaffold(
       appBar: AppBar(
@@ -130,10 +140,7 @@ class _BookingPageState extends State<BookingPage> {
                 // Informasi Pengguna
                 const Text(
                   'Informasi Pengguna',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                 ),
                 const Divider(thickness: 1),
                 const SizedBox(height: 10),
@@ -146,10 +153,7 @@ class _BookingPageState extends State<BookingPage> {
                 // Informasi Buku
                 const Text(
                   'Informasi Buku',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                 ),
                 const Divider(thickness: 1),
                 const SizedBox(height: 10),
@@ -159,15 +163,28 @@ class _BookingPageState extends State<BookingPage> {
                 // Tanggal Booking & Pengembalian
                 const Text(
                   'Tanggal Booking & Pengembalian',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                 ),
                 const Divider(thickness: 1),
                 const SizedBox(height: 10),
                 Text('Tanggal Booking: $bookingDate'),
-                Text('Tanggal Pengembalian: $returnDate'),
+                const SizedBox(height: 10),
+                Row(
+                  children: [
+                    ElevatedButton(
+                      onPressed: () => _selectReturnDate(context),
+                      child: const Text("Pilih Tanggal Pengembalian"),
+                    ),
+                    const SizedBox(width: 10),
+                    Text(
+                      _selectedReturnDate != null
+                          ? DateFormat('dd-MM-yyyy')
+                              .format(_selectedReturnDate!)
+                          : 'Belum dipilih',
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                  ],
+                ),
                 const SizedBox(height: 20),
 
                 // Persetujuan Tata Tertib
@@ -197,7 +214,9 @@ class _BookingPageState extends State<BookingPage> {
                 // Tombol Booking
                 Center(
                   child: ElevatedButton(
-                    onPressed: _isChecked ? _bookBuku : null,
+                    onPressed: _isChecked && _selectedReturnDate != null
+                        ? _bookBuku
+                        : null,
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 40, vertical: 15),
