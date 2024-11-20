@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:perpustakaan/admin/mahasiswa/mahasiswa.dart';
 import 'package:perpustakaan/admin/tambahmahasiwa.dart';
-import 'package:perpustakaan/user/buku.dart';
 import 'package:perpustakaan/admin/tambahbuku.dart';
+import 'package:perpustakaan/admin/buku.dart';
 
 class AdminHomepage extends StatefulWidget {
   @override
@@ -10,11 +10,10 @@ class AdminHomepage extends StatefulWidget {
 }
 
 class _AdminHomepageState extends State<AdminHomepage> {
-  int _selectedIndex = 0; // Menyimpan index menu yang dipilih
+  int _selectedIndex = 0;
 
-  // Daftar widget untuk setiap menu
   final List<Widget> _pages = [
-    BukuPage(), // Halaman Buku
+    BukuPageAdmin(), // Halaman Buku
     TambahBukuPage(), // Halaman Tambah Buku
     ListPeminjamanPage(), // Halaman List Peminjaman
     MahasiswaPage(), // Halaman Mahasiswa
@@ -31,14 +30,14 @@ class _AdminHomepageState extends State<AdminHomepage> {
         title: const Text(
           'E-Libs',
           style: TextStyle(
-            color: Colors.white, // Warna teks putih
-            fontSize: 24, // Ukuran font
-            fontWeight: FontWeight.bold, // Tebal
+            color: Colors.white,
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
             shadows: [
               BoxShadow(
-                color: Colors.black54, // Warna bayangan
-                offset: Offset(2, 2), // Posisi bayangan
-                blurRadius: 4, // Ukuran bayangan
+                color: Colors.black54,
+                offset: Offset(2, 2),
+                blurRadius: 4,
               ),
             ],
           ),
@@ -99,7 +98,7 @@ class _AdminHomepageState extends State<AdminHomepage> {
                 setState(() {
                   _selectedIndex = 1;
                 });
-                Navigator.pop(context); // Menutup drawer setelah menu dipilih
+                Navigator.pop(context);
               },
             ),
             ListTile(
@@ -110,7 +109,7 @@ class _AdminHomepageState extends State<AdminHomepage> {
                 setState(() {
                   _selectedIndex = 2;
                 });
-                Navigator.pop(context); // Menutup drawer setelah menu dipilih
+                Navigator.pop(context);
               },
             ),
             ListTile(
@@ -121,7 +120,7 @@ class _AdminHomepageState extends State<AdminHomepage> {
                 setState(() {
                   _selectedIndex = 3;
                 });
-                Navigator.pop(context); // Menutup drawer setelah menu dipilih
+                Navigator.pop(context);
               },
             ),
             ListTile(
@@ -132,7 +131,7 @@ class _AdminHomepageState extends State<AdminHomepage> {
                 setState(() {
                   _selectedIndex = 4;
                 });
-                Navigator.pop(context); // Menutup drawer setelah menu dipilih
+                Navigator.pop(context);
               },
             ),
             ListTile(
@@ -143,7 +142,7 @@ class _AdminHomepageState extends State<AdminHomepage> {
                 setState(() {
                   _selectedIndex = 5;
                 });
-                Navigator.pop(context); // Menutup drawer setelah menu dipilih
+                Navigator.pop(context);
               },
             ),
             ListTile(
@@ -154,7 +153,7 @@ class _AdminHomepageState extends State<AdminHomepage> {
                 setState(() {
                   _selectedIndex = 6;
                 });
-                Navigator.pop(context); // Menutup drawer setelah menu dipilih
+                Navigator.pop(context);
               },
             ),
             ListTile(
@@ -165,7 +164,7 @@ class _AdminHomepageState extends State<AdminHomepage> {
                 setState(() {
                   _selectedIndex = 7;
                 });
-                Navigator.pop(context); // Menutup drawer setelah menu dipilih
+                Navigator.pop(context);
               },
             ),
             // Menu Log Out
@@ -177,20 +176,17 @@ class _AdminHomepageState extends State<AdminHomepage> {
                 leading: const Icon(Icons.exit_to_app, color: Colors.white),
                 title: const Text(
                   'Keluar',
-                  style: TextStyle(
-                      color: Colors.red), // Warna merah untuk "Keluar"
+                  style: TextStyle(color: Colors.red),
                 ),
                 onTap: () {
-                  Navigator.pushReplacementNamed(
-                      context, '/login'); // Arahkan ke halaman login
+                  Navigator.pushReplacementNamed(context, '/login');
                 },
               ),
             ),
           ],
         ),
       ),
-      body: _pages[
-          _selectedIndex], // Menampilkan halaman berdasarkan index yang dipilih
+      body: _pages[_selectedIndex],
     );
   }
 }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart'; // Import shared_preferences
-import 'package:perpustakaan/user/buku.dart'; // Import model BukuPage
-import 'package:perpustakaan/user/list_peminjaman.dart'; // Import model ListPeminjamanPage
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:perpustakaan/user/buku.dart';
+import 'package:perpustakaan/user/list_peminjaman.dart';
 
 void main() {
   runApp(MyApp());
@@ -59,16 +59,14 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  // Membuat halaman dinamis
   List<Widget> _pages() {
     return [
-      _buildHomePage(), // Home tab with custom AppBar
-      BukuPage(), // Buku page with default AppBar (no custom changes)
-      ListPeminjamanPage(), // List Peminjaman page
+      _buildHomePage(),
+      BukuPage(),
+      ListPeminjamanPage(),
     ];
   }
 
-  // Function to create the Home page
   Widget _buildHomePage() {
     return Container(
       color: Colors.grey[100],
@@ -92,10 +90,10 @@ class _HomePageState extends State<HomePage> {
                 Icon(Icons.home, color: Colors.blue.shade700, size: 80),
                 const SizedBox(height: 20),
                 Text(
-                  'Selamat Datang, $_username', // Display the username here
+                  'Selamat Datang, $_username',
                   style: const TextStyle(
                       fontSize: 30, fontWeight: FontWeight.bold),
-                  textAlign: TextAlign.center, // Center-align the text
+                  textAlign: TextAlign.center,
                 ),
               ],
             ),
@@ -150,9 +148,8 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    _getUserData(); // Memanggil fungsi untuk mengambil data pengguna saat halaman pertama kali dibuka
-    _currentIndex =
-        widget.initialIndex; // Mengatur indeks berdasarkan parameter
+    _getUserData();
+    _currentIndex = widget.initialIndex;
   }
 
   @override
@@ -160,8 +157,7 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: _currentIndex == 0
           ? PreferredSize(
-              preferredSize:
-                  const Size.fromHeight(80), // AppBar height for Home page
+              preferredSize: const Size.fromHeight(80),
               child: AppBar(
                 title: const Text(
                   'E-Libs',
@@ -195,13 +191,11 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
             )
-          : null, // No AppBar for other pages
-
+          : null,
       body: IndexedStack(
         index: _currentIndex,
-        children: _pages(), // Memanggil fungsi untuk mendapatkan halaman
+        children: _pages(),
       ),
-
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         currentIndex: _currentIndex,
