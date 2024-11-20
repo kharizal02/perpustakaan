@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart'; // Import shared_preferences
-import 'package:perpustakaan/model/buku.dart'; // Import model BukuPage
-import 'package:perpustakaan/model/list_peminjaman.dart'; // Import model ListPeminjamanPage
+import 'package:perpustakaan/user/buku.dart'; // Import model BukuPage
+import 'package:perpustakaan/user/list_peminjaman.dart'; // Import model ListPeminjamanPage
 
 void main() {
   runApp(MyApp());

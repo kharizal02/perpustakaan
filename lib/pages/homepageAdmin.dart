@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:perpustakaan/admin/mahasiswa/mahasiswa.dart';
 import 'package:perpustakaan/admin/tambahmahasiwa.dart';
-import 'package:perpustakaan/model/buku.dart';
+import 'package:perpustakaan/user/buku.dart';
 import 'package:perpustakaan/admin/tambahbuku.dart';
+
 class AdminHomepage extends StatefulWidget {
   @override
   _AdminHomepageState createState() => _AdminHomepageState();
@@ -84,7 +85,7 @@ class _AdminHomepageState extends State<AdminHomepage> {
               leading: const Icon(Icons.book, color: Colors.white),
               title: const Text('Buku', style: TextStyle(color: Colors.white)),
               onTap: () {
-                 setState(() {
+                setState(() {
                   _selectedIndex = 0;
                 });
                 Navigator.pop(context);
@@ -202,8 +203,6 @@ class ListPeminjamanPage extends StatelessWidget {
     );
   }
 }
-
-
 
 class RiwayatPinjamPage extends StatelessWidget {
   @override

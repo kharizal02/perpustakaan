@@ -1,22 +1,16 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:perpustakaan/model/bandingkan_buku.dart';
-import 'package:perpustakaan/model/detail_buku.dart';
-import 'package:perpustakaan/util/config/config_mobile.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:perpustakaan/util/config/config.dart';
 
 class BukuPageAdmin extends StatefulWidget {
   @override
- _BukuPageAdminState createState() => _BukuPageAdminState();
+  _BukuPageAdminState createState() => _BukuPageAdminState();
 }
 
 class _BukuPageAdminState extends State<BukuPageAdmin> {
   List<dynamic> _books = [];
   TextEditingController _searchController = TextEditingController();
-  bool _isSelectMode = false; // Menyimpan status mode checkbox
-  List<String> selectedBooks = [];
-  
-  get http => null; // Menyimpan ID buku yang dipilih
 
   @override
   void initState() {
@@ -24,7 +18,7 @@ class _BukuPageAdminState extends State<BukuPageAdmin> {
     _fetchBooks(); // Ambil data buku saat halaman dimuat
   }
 
-  // Fungsi untuk mengambil buku berdasarkan tag pencarian
+  // Fungsi untuk mengambil data buku
   Future<void> _fetchBooks({String? query}) async {
     try {
       var uri =
@@ -36,7 +30,7 @@ class _BukuPageAdminState extends State<BukuPageAdmin> {
       if (response.statusCode == 200) {
         List<dynamic> books = json.decode(response.body);
         setState(() {
-          _books = books; // Mengubah data buku yang diterima menjadi list
+          _books = books;
         });
       } else {
         throw Exception('Gagal mengambil data buku');
@@ -46,39 +40,81 @@ class _BukuPageAdminState extends State<BukuPageAdmin> {
     }
   }
 
-  // Fungsi untuk mengubah status mode checkbox
-  void _toggleSelectMode() {
-    setState(() {
-      _isSelectMode = !_isSelectMode;
-      if (!_isSelectMode)
-        selectedBooks.clear(); // Kosongkan pilihan jika mode dimatikan
-    });
-  }
+  // Fungsi untuk mengubah status buku dengan dialog konfirmasi
+  Future<void> _updateBookStatus(
+      dynamic bookId, String status, String bookTitle) async {
+    // Menampilkan dialog konfirmasi sebelum mengubah status
+    showDialog(
+      context: context,
+      barrierDismissible:
+          false, // Tidak bisa menutup dialog dengan men-tap di luar
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Konfirmasi Perubahan Status'),
+          content: Text(
+              'Apakah Anda yakin ingin mengubah status buku "$bookTitle" menjadi "$status"?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Menutup dialog
+              },
+              child: Text('Batal'),
+            ),
+            TextButton(
+              onPressed: () async {
+                Navigator.of(context).pop(); // Menutup dialog
 
-  // Fungsi untuk menangani checkbox yang dipilih
-  void _onBookSelected(dynamic bookId) {
-    setState(() {
-      String bookIdStr = bookId.toString(); // Pastikan ID adalah String
-      if (selectedBooks.contains(bookIdStr)) {
-        selectedBooks.remove(bookIdStr);
-      } else {
-        selectedBooks.add(bookIdStr);
-      }
-    });
-  }
+                try {
+                  var uri = Uri.http(AppConfig.API_HOST,
+                      '/perpustakaan/buku/update_status_buku_admin.php');
+                  final response = await http.post(uri, body: {
+                    'id_buku': bookId.toString(),
+                    'status': status,
+                  });
 
-  // Fungsi untuk mengarahkan ke halaman perbandingan buku
-  void _compareBooks() {
-    if (selectedBooks.length == 2) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => BookComparisonPage(
-            bookIds: selectedBooks, // Mengirim ID buku yang dipilih
-          ),
-        ),
-      );
-    }
+                  if (response.statusCode == 200) {
+                    final result = json.decode(response.body);
+                    if (result['success'] == true) {
+                      // Menampilkan dialog bahwa status berhasil diperbarui
+                      showDialog(
+                        context: context,
+                        barrierDismissible: false,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: Text('Sukses'),
+                            content: Text(
+                                'Status buku "$bookTitle" berhasil diperbarui menjadi "$status".'),
+                            actions: <Widget>[
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop(); // Menutup dialog
+                                  _fetchBooks(); // Refresh data buku setelah status diperbarui
+                                },
+                                child: Text('OK'),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    } else {
+                      throw Exception(result['message']);
+                    }
+                  } else {
+                    throw Exception('Gagal memperbarui status buku');
+                  }
+                } catch (e) {
+                  print("Error updating book status: $e");
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Gagal memperbarui status buku')),
+                  );
+                }
+              },
+              child: Text('Ya'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -94,10 +130,10 @@ class _BukuPageAdminState extends State<BukuPageAdmin> {
           },
           decoration: InputDecoration(
             hintText: 'Cari Buku ',
-            prefixIcon: Icon(Icons.search, color: Colors.white),
+            prefixIcon: const Icon(Icons.search, color: Colors.white),
             filled: true,
             fillColor: Colors.white70,
-            contentPadding: EdgeInsets.symmetric(vertical: 10.0),
+            contentPadding: const EdgeInsets.symmetric(vertical: 10.0),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(30),
               borderSide: BorderSide.none,
@@ -105,32 +141,20 @@ class _BukuPageAdminState extends State<BukuPageAdmin> {
           ),
         ),
         automaticallyImplyLeading: false,
-        actions: [
-          IconButton(
-            icon: Icon(
-              _isSelectMode ? Icons.close : Icons.check_box,
-              color: Colors.white,
-            ),
-            onPressed: _toggleSelectMode, // Ubah status mode checkbox
-          ),
-        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: RefreshIndicator(
-          onRefresh: () =>
-              _fetchBooks(), // Fitur refresh ketika user pull to refresh
+          onRefresh: _fetchBooks,
           child: _books.isEmpty
-              ? Center(
+              ? const Center(
                   child: Text("Tidak ada data buku",
-                      style: TextStyle(fontSize: 18, color: Colors.grey)))
+                      style: TextStyle(fontSize: 18, color: Colors.grey)),
+                )
               : ListView.builder(
                   itemCount: _books.length,
                   itemBuilder: (context, index) {
                     final book = _books[index];
-                    String bookIdStr =
-                        book['id_buku'].toString(); // Pastikan ID adalah String
-                    bool isSelected = selectedBooks.contains(bookIdStr);
 
                     return Card(
                       shape: RoundedRectangleBorder(
@@ -139,18 +163,10 @@ class _BukuPageAdminState extends State<BukuPageAdmin> {
                       elevation: 3,
                       margin: const EdgeInsets.symmetric(vertical: 8.0),
                       child: ListTile(
-                        contentPadding: EdgeInsets.all(16),
-                        leading: _isSelectMode
-                            ? Checkbox(
-                                value: isSelected,
-                                onChanged: (bool? value) {
-                                  _onBookSelected(book['id_buku']);
-                                },
-                              )
-                            : null,
+                        contentPadding: const EdgeInsets.all(16),
                         title: Text(
                           book['judul_buku'],
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
                             color: Colors.blueAccent,
@@ -164,17 +180,11 @@ class _BukuPageAdminState extends State<BukuPageAdmin> {
                               style: TextStyle(
                                   fontSize: 14, color: Colors.grey[600]),
                             ),
-                            SizedBox(height: 5),
+                            const SizedBox(height: 5),
                             Text(
-                              'Tahun Terbit: ${book['tahun_terbit']}',
+                              'Status: ${book['status'] == 'Tersedia' ? 'Tersedia' : 'Di Pinjam'}',
                               style: TextStyle(
-                                  fontSize: 14, color: Colors.grey[600]),
-                            ),
-                            SizedBox(height: 5),
-                            Text(
-                              'Status: ${book['status'] == '1' ? 'Tersedia' : 'Dipinjam'}',
-                              style: TextStyle(
-                                color: book['status'] == '1'
+                                color: book['status'] == 'Tersedia'
                                     ? Colors.green
                                     : Colors.red,
                                 fontWeight: FontWeight.bold,
@@ -182,40 +192,21 @@ class _BukuPageAdminState extends State<BukuPageAdmin> {
                             ),
                           ],
                         ),
-                        trailing: Icon(
-                          book['status'] == '1'
-                              ? Icons.check_circle
-                              : Icons.cancel,
-                          color:
-                              book['status'] == '1' ? Colors.green : Colors.red,
+                        trailing: Switch(
+                          value: book['status'] == 'Tersedia',
+                          onChanged: (bool value) {
+                            final newStatus =
+                                value ? 'Tersedia' : 'Di Pinjam'; // Ubah status
+                            _updateBookStatus(book['id_buku'], newStatus,
+                                book['judul_buku']); // Update status buku
+                          },
                         ),
-                        onTap: () {
-                          final bookId = book['id_buku'];
-                          if (!_isSelectMode && bookId != null) {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    BookDetailPage(bookId: bookId.toString()),
-                              ),
-                            );
-                          } else if (_isSelectMode) {
-                            _onBookSelected(book['id_buku']);
-                          }
-                        },
                       ),
                     );
                   },
                 ),
         ),
       ),
-      floatingActionButton: _isSelectMode && selectedBooks.length == 2
-          ? FloatingActionButton(
-              onPressed: _compareBooks,
-              backgroundColor: Colors.red,
-              child: Icon(Icons.compare_arrows, color: Colors.white),
-            )
-          : null, // Tombol hanya muncul jika dua buku dipilih
     );
   }
 }

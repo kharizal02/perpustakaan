@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:perpustakaan/util/config/config.dart';
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:perpustakaan/user/perpanjangan.dart';
 
 class ListPeminjamanPage extends StatefulWidget {
   @override
@@ -29,6 +30,8 @@ class _ListPeminjamanPageState extends State<ListPeminjamanPage> {
 
     if (nrp != null) {
       _fetchPeminjaman(nrp!); // Ambil data peminjaman berdasarkan nrp
+    } else {
+      _showErrorDialog("NRP is null! Make sure you are logged in.");
     }
   }
 
@@ -44,7 +47,7 @@ class _ListPeminjamanPageState extends State<ListPeminjamanPage> {
 
         if (data['status'] == 'success') {
           setState(() {
-            peminjamanData = data['data'];
+            peminjamanData = data['data'] ?? [];
             isLoading = false;
           });
         } else {
@@ -56,13 +59,13 @@ class _ListPeminjamanPageState extends State<ListPeminjamanPage> {
         setState(() {
           isLoading = false;
         });
-        throw Exception('Gagal memuat data peminjaman');
+        throw Exception('Failed to load data.');
       }
     } catch (e) {
       setState(() {
         isLoading = false;
       });
-      _showErrorDialog('Terjadi kesalahan: ${e.toString()}');
+      _showErrorDialog('Error: ${e.toString()}');
     }
   }
 
@@ -87,16 +90,36 @@ class _ListPeminjamanPageState extends State<ListPeminjamanPage> {
     );
   }
 
+  // Menampilkan dialog sukses
+  void _showSuccessDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Sukses'),
+          content: Text(message),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Tutup dialog
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Daftar Peminjaman'),
-        backgroundColor:
-            Colors.blueAccent, // Memberikan warna AppBar yang lebih modern
+        backgroundColor: Colors.blueAccent,
         elevation: 0,
         centerTitle: true,
-        automaticallyImplyLeading: false, // Menonaktifkan tombol kembali
+        automaticallyImplyLeading: false,
       ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -120,10 +143,9 @@ class _ListPeminjamanPageState extends State<ListPeminjamanPage> {
                       elevation: 4,
                       child: ListTile(
                         contentPadding: const EdgeInsets.all(16),
-                        leading: Icon(Icons.book,
-                            color: Colors.blueAccent), // Ikon buku
+                        leading: Icon(Icons.book, color: Colors.blueAccent),
                         title: Text(
-                          peminjaman['judul_buku'],
+                          peminjaman['judul_buku'] ?? 'No Title',
                           style: TextStyle(
                               fontSize: 18, fontWeight: FontWeight.bold),
                         ),
@@ -138,17 +160,43 @@ class _ListPeminjamanPageState extends State<ListPeminjamanPage> {
                             ),
                             SizedBox(height: 4),
                             Text(
-                              'Tanggal Pengembalian: ${peminjaman['tanggal_pengembalian']}',
+                              'Tenggat Pengembalian: ${peminjaman['tanggal_pengembalian']}',
                               style: TextStyle(
                                   fontSize: 14, color: Colors.black54),
                             ),
                           ],
                         ),
-                        trailing: Icon(Icons.arrow_forward_ios,
-                            size: 16, color: Colors.blueAccent),
-                        onTap: () {
-                          // Aksi saat item ditekan
-                        },
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconButton(
+                              icon: Icon(Icons.alarm_add, color: Colors.orange),
+                              onPressed: () {
+                                // Arahkan ke halaman PerpanjanganPage
+                                if (peminjaman['judul_buku'] != null &&
+                                    peminjaman['nama'] != null) {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => PerpanjanganPage(
+                                        judulBuku: peminjaman['judul_buku'] ??
+                                            'No Title',
+                                        peminjam:
+                                            peminjaman['nama'] ?? 'Unknown',
+                                        tanggalPengembalian: peminjaman[
+                                                'tanggal_pengembalian'] ??
+                                            'No Date', // Pastikan tanggal pengembalian dikirimkan
+                                      ),
+                                    ),
+                                  );
+                                } else {
+                                  _showErrorDialog(
+                                      'Data peminjaman tidak lengkap.');
+                                }
+                              },
+                            ),
+                          ],
+                        ),
                       ),
                     );
                   },

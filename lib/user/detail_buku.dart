@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:perpustakaan/util/config/config.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:perpustakaan/model/booking.dart';
+import 'package:perpustakaan/user/booking.dart';
 
 class BookDetailPage extends StatefulWidget {
   final String bookId;
@@ -43,7 +43,6 @@ class _BookDetailPageState extends State<BookDetailPage> {
     }
   }
 
-  // Fungsi untuk mengarahkan ke halaman booking dengan mengambil data dari SharedPreferences
   Future<void> _navigateToBookingPage(String judulBuku) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String nrp = prefs.getString('nrp') ?? 'NRP tidak ditemukan';
@@ -156,26 +155,29 @@ class _BookDetailPageState extends State<BookDetailPage> {
                         Row(
                           children: [
                             Icon(
-                              book['status'] == '1'
+                              book['status'].toLowerCase() ==
+                                      'tersedia' // Cek jika status 'tersedia'
                                   ? Icons.check_circle
                                   : Icons.cancel,
-                              color: book['status'] == '1'
+                              color: book['status'].toLowerCase() == 'tersedia'
                                   ? Colors.green
                                   : Colors.red,
                             ),
                             const SizedBox(width: 10),
                             Text(
-                              'Status: ${book['status'] == '1' ? 'Tersedia' : 'Dipinjam'}',
+                              'Status: ${book['status'].toLowerCase() == 'tersedia' ? 'Tersedia' : 'Dipinjam'}',
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
-                                color: book['status'] == '1'
-                                    ? Colors.green
-                                    : Colors.red,
+                                color:
+                                    book['status'].toLowerCase() == 'tersedia'
+                                        ? Colors.green
+                                        : Colors.red,
                               ),
                             ),
                           ],
                         ),
+
                         const SizedBox(height: 20),
 
                         // Deskripsi
@@ -216,34 +218,43 @@ class _BookDetailPageState extends State<BookDetailPage> {
                 ),
                 const SizedBox(height: 20),
                 // Tombol Booking
-                ElevatedButton(
-                  onPressed: () {
-                    _navigateToBookingPage(book['judul_buku']);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red, // Latar belakang merah
-                    foregroundColor: Colors.white, // Warna teks putih
-                    elevation:
-                        10, // Memberikan bayangan untuk efek tombol yang lebih mewah
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(
-                          15), // Membuat sudut tombol melengkung
+                if (book['status'].toLowerCase() == 'tersedia') ...[
+                  ElevatedButton(
+                    onPressed: () {
+                      _navigateToBookingPage(book['judul_buku']);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red, // Latar belakang merah
+                      foregroundColor: Colors.white, // Warna teks putih
+                      elevation:
+                          10, // Memberikan bayangan untuk efek tombol yang lebih mewah
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(
+                            15), // Membuat sudut tombol melengkung
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 12,
+                          horizontal:
+                              24), // Menambah padding untuk ukuran tombol lebih besar
                     ),
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 12,
-                        horizontal:
-                            24), // Menambah padding untuk ukuran tombol lebih besar
-                  ),
-                  child: const Text(
-                    'Booking Buku',
-                    style: TextStyle(
-                      fontSize:
-                          18, // Menambah ukuran font untuk tampilan lebih besar
-                      fontWeight: FontWeight
-                          .bold, // Memberikan efek teks yang lebih tebal
+                    child: const Text(
+                      'Booking Buku',
+                      style: TextStyle(
+                        fontSize:
+                            18, // Menambah ukuran font untuk tampilan lebih besar
+                        fontWeight: FontWeight
+                            .bold, // Memberikan efek teks yang lebih tebal
+                      ),
                     ),
                   ),
-                ),
+                ] else ...[
+                  // Jika buku dipinjam, tombol booking tidak ditampilkan
+                  const SizedBox(height: 20),
+                  Text(
+                    'Buku ini sedang dipinjam.',
+                    style: TextStyle(fontSize: 18, color: Colors.red),
+                  ),
+                ],
               ],
             ),
           );
