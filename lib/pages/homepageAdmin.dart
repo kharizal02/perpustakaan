@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:perpustakaan/admin/buku.dart';
+import 'package:perpustakaan/admin/mahasiswa/mahasiswa.dart';
 import 'package:perpustakaan/admin/tambahmahasiwa.dart';
 import 'package:perpustakaan/model/buku.dart';
 import 'package:perpustakaan/admin/tambahbuku.dart';
-
 class AdminHomepage extends StatefulWidget {
   @override
   _AdminHomepageState createState() => _AdminHomepageState();
@@ -85,12 +84,10 @@ class _AdminHomepageState extends State<AdminHomepage> {
               leading: const Icon(Icons.book, color: Colors.white),
               title: const Text('Buku', style: TextStyle(color: Colors.white)),
               onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => BukuPageAdmin(),
-                  ),
-                );
+                 setState(() {
+                  _selectedIndex = 0;
+                });
+                Navigator.pop(context);
               },
             ),
             ListTile(
@@ -206,14 +203,7 @@ class ListPeminjamanPage extends StatelessWidget {
   }
 }
 
-class MahasiswaPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return const Center(
-      child: Text("Halaman Mahasiswa"),
-    );
-  }
-}
+
 
 class RiwayatPinjamPage extends StatelessWidget {
   @override
