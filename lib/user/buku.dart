@@ -97,7 +97,7 @@ class _BukuPageState extends State<BukuPage> {
             _fetchBooks(query: text);
           },
           decoration: InputDecoration(
-            hintText: 'Cari Buku',
+            hintText: 'Cari Buku (Judul, Penulis, Prodi, Tahun Terbit)',
             prefixIcon: const Icon(Icons.search, color: Colors.white),
             filled: true,
             fillColor: Colors.white70,
@@ -173,6 +173,12 @@ class _BukuPageState extends State<BukuPage> {
                               children: [
                                 Text(
                                   'Penulis: ${book['penulis']}',
+                                  style: TextStyle(
+                                      fontSize: 14, color: Colors.grey[600]),
+                                ),
+                                const SizedBox(height: 5),
+                                Text(
+                                  'Prodi: ${book['prodi']}',
                                   style: TextStyle(
                                       fontSize: 14, color: Colors.grey[600]),
                                 ),

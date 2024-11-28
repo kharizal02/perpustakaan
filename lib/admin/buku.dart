@@ -6,10 +6,10 @@ import 'package:perpustakaan/admin/detail_buku.dart';
 
 class BukuPageAdmin extends StatefulWidget {
   @override
-  _BukuPageState createState() => _BukuPageState();
+  _BukuPageAdminState createState() => _BukuPageAdminState();
 }
 
-class _BukuPageState extends State<BukuPageAdmin> {
+class _BukuPageAdminState extends State<BukuPageAdmin> {
   List<dynamic> _books = [];
   TextEditingController _searchController = TextEditingController();
   bool _isSelectMode = false;
@@ -71,6 +71,19 @@ class _BukuPageState extends State<BukuPageAdmin> {
     });
   }
 
+  void _navigateToDetail(String bookId) async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => BookDetailPage(bookId: bookId),
+      ),
+    );
+
+    if (result == true) {
+      _fetchBooks(); // Refresh data jika buku berhasil dihapus
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -83,7 +96,7 @@ class _BukuPageState extends State<BukuPageAdmin> {
             _fetchBooks(query: text);
           },
           decoration: InputDecoration(
-            hintText: 'Cari Buku',
+            hintText: 'Cari Buku (Judul, Penulis, Prodi, Tahun Terbit)',
             prefixIcon: const Icon(Icons.search, color: Colors.white),
             filled: true,
             fillColor: Colors.white70,
@@ -113,7 +126,7 @@ class _BukuPageState extends State<BukuPageAdmin> {
                         String bookIdStr = book['id_buku'].toString();
                         bool isSelected = selectedBooks.contains(bookIdStr);
 
-                        // Improved status handling
+                        // Status dan Warna
                         final isAvailable =
                             book['status'].toLowerCase() == 'tersedia';
                         final statusText =
@@ -155,6 +168,12 @@ class _BukuPageState extends State<BukuPageAdmin> {
                                 ),
                                 const SizedBox(height: 5),
                                 Text(
+                                  'Prodi: ${book['prodi']}',
+                                  style: TextStyle(
+                                      fontSize: 14, color: Colors.grey[600]),
+                                ),
+                                const SizedBox(height: 5),
+                                Text(
                                   'Tahun Terbit: ${book['tahun_terbit']}',
                                   style: TextStyle(
                                       fontSize: 14, color: Colors.grey[600]),
@@ -176,13 +195,7 @@ class _BukuPageState extends State<BukuPageAdmin> {
                             onTap: () {
                               final bookId = book['id_buku'];
                               if (!_isSelectMode && bookId != null) {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => BookDetailPage(
-                                        bookId: bookId.toString()),
-                                  ),
-                                );
+                                _navigateToDetail(bookId.toString());
                               } else if (_isSelectMode) {
                                 _onBookSelected(book['id_buku']);
                               }

@@ -18,10 +18,9 @@ class _ListPeminjamanPageState extends State<ListPeminjamanPage> {
   @override
   void initState() {
     super.initState();
-    _getNrp(); // Ambil nrp dari SharedPreferences saat halaman dimuat
+    _getNrp();
   }
 
-  // Mengambil nrp dari SharedPreferences
   Future<void> _getNrp() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
@@ -39,7 +38,7 @@ class _ListPeminjamanPageState extends State<ListPeminjamanPage> {
   Future<void> _fetchPeminjaman(String nrp) async {
     try {
       var uri = Uri.http(AppConfig.API_HOST,
-          '/perpustakaan/buku/get_booking.php', {'nrp': nrp});
+          '/perpustakaan/booking/get_booking.php', {'nrp': nrp});
       final response = await http.get(uri);
 
       if (response.statusCode == 200) {
@@ -144,10 +143,24 @@ class _ListPeminjamanPageState extends State<ListPeminjamanPage> {
                       child: ListTile(
                         contentPadding: const EdgeInsets.all(16),
                         leading: Icon(Icons.book, color: Colors.blueAccent),
-                        title: Text(
-                          peminjaman['judul_buku'] ?? 'No Title',
-                          style: TextStyle(
-                              fontSize: 18, fontWeight: FontWeight.bold),
+                        title: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Menampilkan ID Booking di atas judul
+                            Text(
+                              'ID Booking: ${peminjaman['id_booking']}',
+                              style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.black54,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                            SizedBox(height: 4),
+                            Text(
+                              peminjaman['judul_buku'] ?? 'No Title',
+                              style: TextStyle(
+                                  fontSize: 18, fontWeight: FontWeight.bold),
+                            ),
+                          ],
                         ),
                         subtitle: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -174,18 +187,21 @@ class _ListPeminjamanPageState extends State<ListPeminjamanPage> {
                               onPressed: () {
                                 // Arahkan ke halaman PerpanjanganPage
                                 if (peminjaman['judul_buku'] != null &&
-                                    peminjaman['nama'] != null) {
+                                    peminjaman['nama'] != null &&
+                                    peminjaman['id_booking'] != null) {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) => PerpanjanganPage(
+                                        idBooking: peminjaman['id_booking']
+                                            .toString(), // Memastikan id_booking adalah String
                                         judulBuku: peminjaman['judul_buku'] ??
                                             'No Title',
                                         peminjam:
                                             peminjaman['nama'] ?? 'Unknown',
                                         tanggalPengembalian: peminjaman[
                                                 'tanggal_pengembalian'] ??
-                                            'No Date', // Pastikan tanggal pengembalian dikirimkan
+                                            'No Date',
                                       ),
                                     ),
                                   );

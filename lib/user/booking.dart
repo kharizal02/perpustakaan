@@ -8,12 +8,14 @@ import 'package:perpustakaan/pages/homepage.dart';
 class BookingPage extends StatefulWidget {
   final String nrp;
   final String nama;
-  final String judulBuku;
+  final String idBuku; // ID buku
+  final String judulBuku; // Judul buku
 
   const BookingPage({
     super.key,
     required this.nrp,
     required this.nama,
+    required this.idBuku,
     required this.judulBuku,
   });
 
@@ -43,23 +45,51 @@ class _BookingPageState extends State<BookingPage> {
     }
   }
 
-  // Fungsi untuk melakukan pemesanan buku
+  // Fungsi untuk mengecek peminjaman aktif
+  Future<bool> _checkPeminjamanAktif() async {
+    try {
+      var uri = Uri.http(AppConfig.API_HOST,
+          '/perpustakaan/booking/check_booking.php', {'nrp': widget.nrp});
+      var response = await http.get(uri);
+
+      var data = json.decode(response.body);
+      if (data['status'] == 'error') {
+        _showDialog(data['message'], false);
+        return false;
+      }
+      return true; // Mahasiswa dapat melakukan peminjaman
+    } catch (e) {
+      _showSnackbar("Terjadi kesalahan: $e");
+      return false;
+    }
+  }
+
+  // Fungsi untuk melakukan booking buku
   Future<void> _bookBuku() async {
+    // Periksa peminjaman aktif terlebih dahulu
+    bool canBook = await _checkPeminjamanAktif();
+    if (!canBook) {
+      return; // Jika sudah ada 2 peminjaman aktif, tidak lanjutkan
+    }
+
     final bookingDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
     final returnDate = DateFormat('yyyy-MM-dd').format(_selectedReturnDate!);
 
     try {
-      var uri = Uri.http(AppConfig.API_HOST, '/perpustakaan/buku/booking.php');
+      var uri =
+          Uri.http(AppConfig.API_HOST, '/perpustakaan/booking/booking.php');
       var response = await http.post(
         uri,
         body: {
           'nrp': widget.nrp,
           'nama': widget.nama,
-          'judul_buku': widget.judulBuku,
+          'id_buku': widget.idBuku,
+          'judul_buku': widget.judulBuku, // Tambahkan judul buku ke server
           'tanggal_booking': bookingDate,
           'tanggal_pengembalian': returnDate,
         },
       );
+
       var data = json.decode(response.body);
 
       if (data['status'] == 'success') {
@@ -137,7 +167,6 @@ class _BookingPageState extends State<BookingPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Informasi Pengguna
                 const Text(
                   'Informasi Pengguna',
                   style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
@@ -149,18 +178,17 @@ class _BookingPageState extends State<BookingPage> {
                 Text('Nama: ${widget.nama}',
                     style: const TextStyle(fontSize: 18)),
                 const SizedBox(height: 20),
-
-                // Informasi Buku
                 const Text(
                   'Informasi Buku',
                   style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                 ),
                 const Divider(thickness: 1),
                 const SizedBox(height: 10),
-                Text('Judul Buku: ${widget.judulBuku}'),
+                Text('ID Buku: ${widget.idBuku}',
+                    style: const TextStyle(fontSize: 18)),
+                Text('Judul Buku: ${widget.judulBuku}',
+                    style: const TextStyle(fontSize: 18)),
                 const SizedBox(height: 20),
-
-                // Tanggal Booking & Pengembalian
                 const Text(
                   'Tanggal Booking & Pengembalian',
                   style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
@@ -186,8 +214,6 @@ class _BookingPageState extends State<BookingPage> {
                   ],
                 ),
                 const SizedBox(height: 20),
-
-                // Persetujuan Tata Tertib
                 Row(
                   children: [
                     Checkbox(
@@ -210,8 +236,6 @@ class _BookingPageState extends State<BookingPage> {
                   ],
                 ),
                 const SizedBox(height: 30),
-
-                // Tombol Booking
                 Center(
                   child: ElevatedButton(
                     onPressed: _isChecked && _selectedReturnDate != null

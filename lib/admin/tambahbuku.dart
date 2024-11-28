@@ -20,21 +20,25 @@ class _TambahBukuPageState extends State<TambahBukuPage> {
 
   // List of Program Studi options
   List<String> _prodiOptions = [
-    'Teknik Informatika',
-    'Teknik Komputer',
+    'D4 Teknik Informatika',
+    'D3 Teknik Informatika',
+    'D4 Teknik Komputer',
     'Sains Data Terapan',
-    'Teknik Mekatronika',
-    'Sistem Pembangkit Energi',
-    'Teknik Elektronika',
-    'Teknik Elektro Industri',
-    'Teknik Telekomunikasi',
-    'Teknik Rekayasa Internet',
-    'Teknik Rekayasa Multimedia',
-    'Multimedia Kreatif',
-    'Teknologi Game',
+    'D4 Teknik Mekatronika',
+    'D4 Sistem Pembangkit Energi',
+    'D4 Teknik Elektronika',
+    'D3 Teknik Elektronika',
+    'D4 Teknik Elektro Industri',
+    'D3 Teknik Elektro Industri',
+    'D4 Teknik Telekomunikasi',
+    'D3 Teknik Telekomunikasi',
+    'D4 Teknik Rekayasa Internet',
+    'D4 Teknik Rekayasa Multimedia',
+    'D3 Multimedia Kreatif',
+    'D4 Teknologi Game',
   ];
 
-  String? _selectedProdi;
+  String? _selectedProdi; // For selected program studi
 
   Future<void> _tambahBuku() async {
     if (_formKey.currentState!.validate()) {

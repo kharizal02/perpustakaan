@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:perpustakaan/admin/mahasiswa/mahasiswa.dart';
+import 'package:perpustakaan/admin/perpanjangan.dart';
+import 'package:perpustakaan/admin/riwayat_pinjam.dart';
 import 'package:perpustakaan/admin/tambahmahasiwa.dart';
 import 'package:perpustakaan/admin/tambahbuku.dart';
 import 'package:perpustakaan/admin/buku.dart';
+import 'package:perpustakaan/admin/list_peminjaman.dart';
 
 class AdminHomepage extends StatefulWidget {
   @override
@@ -16,11 +19,10 @@ class _AdminHomepageState extends State<AdminHomepage> {
     BukuPageAdmin(), // Halaman Buku
     TambahBukuPage(), // Halaman Tambah Buku
     ListPeminjamanPage(), // Halaman List Peminjaman
-    MahasiswaPage(), // Halaman Mahasiswa
-    RiwayatPinjamPage(), // Halaman Riwayat Pinjam
-    AddMahasiswaForm(), // Halaman Tambah Mahasiswa
-    DataTelatPage(), // Halaman Data Telat
     PerpanjanganPage(), // Halaman Perpanjangan
+    RiwayatBookingPage(), // Halaman Riwayat Pinjam
+    MahasiswaPage(), // Halaman Mahasiswa
+    TambahMahasiswaPage(), // Halaman Tambah Mahasiswa
   ];
 
   @override
@@ -113,8 +115,8 @@ class _AdminHomepageState extends State<AdminHomepage> {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.people, color: Colors.white),
-              title: const Text('Mahasiswa',
+              leading: const Icon(Icons.update, color: Colors.white),
+              title: const Text('Perpanjangan',
                   style: TextStyle(color: Colors.white)),
               onTap: () {
                 setState(() {
@@ -135,8 +137,8 @@ class _AdminHomepageState extends State<AdminHomepage> {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.person_add, color: Colors.white),
-              title: const Text('Tambah Mahasiswa',
+              leading: const Icon(Icons.people, color: Colors.white),
+              title: const Text('Mahasiswa',
                   style: TextStyle(color: Colors.white)),
               onTap: () {
                 setState(() {
@@ -146,23 +148,12 @@ class _AdminHomepageState extends State<AdminHomepage> {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.report_problem, color: Colors.white),
-              title: const Text('Data Telat',
+              leading: const Icon(Icons.person_add, color: Colors.white),
+              title: const Text('Tambah Mahasiswa',
                   style: TextStyle(color: Colors.white)),
               onTap: () {
                 setState(() {
                   _selectedIndex = 6;
-                });
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.update, color: Colors.white),
-              title: const Text('Perpanjangan',
-                  style: TextStyle(color: Colors.white)),
-              onTap: () {
-                setState(() {
-                  _selectedIndex = 7;
                 });
                 Navigator.pop(context);
               },
@@ -187,42 +178,6 @@ class _AdminHomepageState extends State<AdminHomepage> {
         ),
       ),
       body: _pages[_selectedIndex],
-    );
-  }
-}
-
-class ListPeminjamanPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return const Center(
-      child: Text("Halaman List Peminjaman"),
-    );
-  }
-}
-
-class RiwayatPinjamPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return const Center(
-      child: Text("Halaman Riwayat Pinjam"),
-    );
-  }
-}
-
-class DataTelatPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return const Center(
-      child: Text("Halaman Data Telat"),
-    );
-  }
-}
-
-class PerpanjanganPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return const Center(
-      child: Text("Halaman Perpanjangan"),
     );
   }
 }

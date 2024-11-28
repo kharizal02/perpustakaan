@@ -33,7 +33,10 @@ class _BookDetailPageState extends State<BookDetailPage> {
       final response = await http.get(uri);
 
       if (response.statusCode == 200) {
-        return json.decode(response.body);
+        var data = json.decode(response.body);
+        // Pastikan id_buku adalah string
+        data['id_buku'] = data['id_buku'].toString();
+        return data;
       } else {
         throw Exception('Gagal mengambil detail buku');
       }
@@ -43,7 +46,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
     }
   }
 
-  Future<void> _navigateToBookingPage(String judulBuku) async {
+  Future<void> _navigateToBookingPage(String idBuku, String judulBuku) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String nrp = prefs.getString('nrp') ?? 'NRP tidak ditemukan';
     String nama = prefs.getString('nama') ?? 'Nama tidak ditemukan';
@@ -54,7 +57,8 @@ class _BookDetailPageState extends State<BookDetailPage> {
         builder: (context) => BookingPage(
           nrp: nrp,
           nama: nama,
-          judulBuku: judulBuku,
+          idBuku: idBuku, // Pastikan idBuku diteruskan
+          judulBuku: judulBuku, // Pastikan judulBuku diteruskan
         ),
       ),
     );
@@ -90,20 +94,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Gambar Sampul Buku
-                        Container(
-                          height: 200,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(15),
-                            image: DecorationImage(
-                              image: NetworkImage(book['gambar_sampul'] ??
-                                  'https://via.placeholder.com/150'),
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        ),
                         const SizedBox(height: 20),
-
                         // Judul Buku
                         Text(
                           book['judul_buku'],
@@ -114,6 +105,12 @@ class _BookDetailPageState extends State<BookDetailPage> {
                           ),
                         ),
                         const SizedBox(height: 10),
+                        Text(
+                          'ID Buku: ${book['id_buku']}',
+                          style:
+                              TextStyle(fontSize: 18, color: Colors.grey[700]),
+                        ),
+                        const SizedBox(height: 5),
 
                         // Penulis dan Prodi
                         Text(
@@ -221,7 +218,8 @@ class _BookDetailPageState extends State<BookDetailPage> {
                 if (book['status'].toLowerCase() == 'tersedia') ...[
                   ElevatedButton(
                     onPressed: () {
-                      _navigateToBookingPage(book['judul_buku']);
+                      _navigateToBookingPage(
+                          book['id_buku'], book['judul_buku']);
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.red, // Latar belakang merah
@@ -233,9 +231,10 @@ class _BookDetailPageState extends State<BookDetailPage> {
                             15), // Membuat sudut tombol melengkung
                       ),
                       padding: const EdgeInsets.symmetric(
-                          vertical: 12,
-                          horizontal:
-                              24), // Menambah padding untuk ukuran tombol lebih besar
+                        vertical: 12,
+                        horizontal:
+                            24, // Menambah padding untuk ukuran tombol lebih besar
+                      ),
                     ),
                     child: const Text(
                       'Booking Buku',

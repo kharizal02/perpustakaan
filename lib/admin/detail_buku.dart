@@ -41,6 +41,95 @@ class _BookDetailPageState extends State<BookDetailPage> {
     }
   }
 
+  Future<void> _deleteBook(String bookId) async {
+    try {
+      var uri =
+          Uri.http(AppConfig.API_HOST, '/perpustakaan/buku/hapus_buku.php', {
+        'id_buku': bookId,
+      });
+
+      final response = await http.get(uri);
+
+      if (response.statusCode == 200) {
+        final result = json.decode(response.body);
+        if (result['success']) {
+          // Berhasil menghapus buku
+          _showResultDialog(
+            title: "Sukses",
+            message: "Buku berhasil dihapus.",
+            success: true,
+          );
+        } else {
+          throw Exception('Gagal menghapus buku');
+        }
+      } else {
+        throw Exception('Gagal menghapus buku');
+      }
+    } catch (e) {
+      print("Error deleting book: $e");
+      _showResultDialog(
+        title: "Kesalahan",
+        message: "Terjadi kesalahan saat menghapus buku.",
+        success: false,
+      );
+    }
+  }
+
+  void _showResultDialog(
+      {required String title, required String message, required bool success}) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(title),
+          content: Text(message),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop(); // Tutup dialog
+                if (success) {
+                  // Pop dengan result true untuk mengindikasikan refresh
+                  Navigator.of(context)
+                      .pop(true); // Kembali ke halaman sebelumnya
+                }
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showConfirmationDialog(String bookId) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Konfirmasi"),
+          content: const Text("Apakah Anda yakin ingin menghapus buku ini?"),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Batal'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text('Hapus'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                _deleteBook(bookId);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -60,6 +149,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
           }
 
           var book = snapshot.data!;
+          bool isAvailable = book['status'].toLowerCase() == 'tersedia';
 
           return Padding(
             padding: const EdgeInsets.all(16.0),
@@ -71,27 +161,25 @@ class _BookDetailPageState extends State<BookDetailPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Gambar Sampul Buku
-                        Container(
-                          height: 200,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(15),
-                            image: DecorationImage(
-                              image: NetworkImage(book['gambar_sampul'] ??
-                                  'https://via.placeholder.com/150'),
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        ),
                         const SizedBox(height: 20),
 
-                        // Judul Buku
+                        // Judul Buku dan ID Buku
                         Text(
                           book['judul_buku'],
                           style: const TextStyle(
                             fontSize: 26,
                             fontWeight: FontWeight.bold,
                             color: Colors.blueAccent,
+                          ),
+                        ),
+                        const SizedBox(height: 5),
+
+                        // ID Buku
+                        Text(
+                          'ID Buku: ${book['id_buku']}',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.grey[600],
                           ),
                         ),
                         const SizedBox(height: 10),
@@ -136,24 +224,16 @@ class _BookDetailPageState extends State<BookDetailPage> {
                         Row(
                           children: [
                             Icon(
-                              book['status'].toLowerCase() ==
-                                      'tersedia' // Cek jika status 'tersedia'
-                                  ? Icons.check_circle
-                                  : Icons.cancel,
-                              color: book['status'].toLowerCase() == 'tersedia'
-                                  ? Colors.green
-                                  : Colors.red,
+                              isAvailable ? Icons.check_circle : Icons.cancel,
+                              color: isAvailable ? Colors.green : Colors.red,
                             ),
                             const SizedBox(width: 10),
                             Text(
-                              'Status: ${book['status'].toLowerCase() == 'tersedia' ? 'Tersedia' : 'Dipinjam'}',
+                              'Status: ${isAvailable ? 'Tersedia' : 'Dipinjam'}',
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
-                                color:
-                                    book['status'].toLowerCase() == 'tersedia'
-                                        ? Colors.green
-                                        : Colors.red,
+                                color: isAvailable ? Colors.green : Colors.red,
                               ),
                             ),
                           ],
@@ -194,6 +274,28 @@ class _BookDetailPageState extends State<BookDetailPage> {
                           ),
                         ),
                       ],
+                    ),
+                  ),
+                ),
+
+                // Tombol Hapus Buku
+                Visibility(
+                  visible: isAvailable,
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 20),
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red, // Warna tombol merah
+                      ),
+                      onPressed: () {
+                        _showConfirmationDialog(widget.bookId);
+                      },
+                      child: const Text(
+                        "Hapus Buku",
+                        style: TextStyle(
+                          color: Colors.white, // Warna tulisan menjadi putih
+                        ),
+                      ),
                     ),
                   ),
                 ),
