@@ -23,36 +23,48 @@ class _BukuPageState extends State<BukuPage> {
     _fetchBooks();
   }
 
-  Future<void> _fetchBooks({String? query}) async {
-    setState(() {
-      _isLoading = true;
+   Future<void> _fetchBooks({String? query}) async {
+  setState(() {
+    _isLoading = true;
+  });
+
+  try {
+    var uri = Uri.http(AppConfig.API_HOST, '/perpustakaan/buku/get_buku.php', {
+      'query': query ?? '',
     });
+    final response = await http.get(uri);
 
-    try {
-      var uri =
-          Uri.http(AppConfig.API_HOST, '/perpustakaan/buku/get_buku.php', {
-        'query': query ?? '',
+    if (response.statusCode == 200) {
+      List<dynamic> books = json.decode(response.body);
+
+      // Sorting books: 'tersedia' di atas, lainnya di bawah
+      books.sort((a, b) {
+        String statusA = a['status'].toLowerCase();
+        String statusB = b['status'].toLowerCase();
+        if (statusA == 'tersedia' && statusB != 'tersedia') {
+          return -1; // 'tersedia' lebih tinggi
+        } else if (statusA != 'tersedia' && statusB == 'tersedia') {
+          return 1; // 'dipinjam' lebih rendah
+        }
+        return 0; // status sama, tidak diubah
       });
-      final response = await http.get(uri);
 
-      if (response.statusCode == 200) {
-        List<dynamic> books = json.decode(response.body);
-        setState(() {
-          _books = books;
-          _isLoading = false;
-        });
-      } else {
-        throw Exception('Gagal mengambil data buku');
-      }
-    } catch (e) {
       setState(() {
+        _books = books;
         _isLoading = false;
       });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e')),
-      );
+    } else {
+      throw Exception('Gagal mengambil data buku');
     }
+  } catch (e) {
+    setState(() {
+      _isLoading = false;
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Error: $e')),
+    );
   }
+}
 
   void _toggleSelectMode() {
     setState(() {
