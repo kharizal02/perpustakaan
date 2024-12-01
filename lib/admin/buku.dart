@@ -28,6 +28,7 @@ class _BukuPageAdminState extends State<BukuPageAdmin> {
   });
 
   try {
+    // Menggunakan endpoint utama untuk mendapatkan data buku
     var uri = Uri.http(AppConfig.API_HOST, '/perpustakaan/buku/get_buku.php', {
       'query': query ?? '',
     });
@@ -36,16 +37,23 @@ class _BukuPageAdminState extends State<BukuPageAdmin> {
     if (response.statusCode == 200) {
       List<dynamic> books = json.decode(response.body);
 
-      // Sorting books: 'tersedia' di atas, lainnya di bawah
+      // Sorting gabungan:
+      // 1. Buku dengan status 'tersedia' di atas
+      // 2. Dalam kelompok 'tersedia', urutkan berdasarkan total_peminjaman menurun
       books.sort((a, b) {
+        // Sorting pertama: berdasarkan status
         String statusA = a['status'].toLowerCase();
         String statusB = b['status'].toLowerCase();
         if (statusA == 'tersedia' && statusB != 'tersedia') {
-          return -1; // 'tersedia' lebih tinggi
+          return -1;
         } else if (statusA != 'tersedia' && statusB == 'tersedia') {
-          return 1; // 'dipinjam' lebih rendah
+          return 1;
         }
-        return 0; // status sama, tidak diubah
+        
+        // Sorting kedua: berdasarkan total_peminjaman
+        int totalPeminjamanA = a['total_peminjaman'] ?? 0;
+        int totalPeminjamanB = b['total_peminjaman'] ?? 0;
+        return totalPeminjamanB.compareTo(totalPeminjamanA); // Descending order
       });
 
       setState(() {
@@ -64,6 +72,7 @@ class _BukuPageAdminState extends State<BukuPageAdmin> {
     );
   }
 }
+
 
 
   void _toggleSelectMode() {
