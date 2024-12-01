@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:perpustakaan/admin/mahasiswa/mahasiswa.dart';
-import 'package:perpustakaan/admin/perpanjangan.dart';
-import 'package:perpustakaan/admin/riwayat_pinjam.dart';
-import 'package:perpustakaan/admin/tambahmahasiwa.dart';
-import 'package:perpustakaan/admin/tambahbuku.dart';
-import 'package:perpustakaan/admin/buku.dart';
-import 'package:perpustakaan/admin/list_peminjaman.dart';
+import 'package:e_libs/admin/mahasiswa/mahasiswa.dart';
+import 'package:e_libs/admin/perpanjangan.dart';
+import 'package:e_libs/admin/riwayat_pinjam.dart';
+import 'package:e_libs/admin/tambahmahasiwa.dart';
+import 'package:e_libs/admin/tambahbuku.dart';
+import 'package:e_libs/admin/buku.dart';
+import 'package:e_libs/admin/list_peminjaman.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AdminHomepage extends StatefulWidget {
   @override
@@ -14,6 +15,7 @@ class AdminHomepage extends StatefulWidget {
 
 class _AdminHomepageState extends State<AdminHomepage> {
   int _selectedIndex = 0;
+  String? _adminEmail; // Variable untuk menyimpan email admin
 
   final List<Widget> _pages = [
     BukuPageAdmin(), // Halaman Buku
@@ -24,6 +26,20 @@ class _AdminHomepageState extends State<AdminHomepage> {
     MahasiswaPage(), // Halaman Mahasiswa
     TambahMahasiswaPage(), // Halaman Tambah Mahasiswa
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadAdminEmail();
+  }
+
+  // Fungsi untuk memuat email admin dari SharedPreferences
+  Future<void> _loadAdminEmail() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _adminEmail = prefs.getString('email');
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -65,15 +81,18 @@ class _AdminHomepageState extends State<AdminHomepage> {
           padding: EdgeInsets.zero,
           children: <Widget>[
             // Header drawer dengan gambar atau nama
-            const UserAccountsDrawerHeader(
-              accountName: Text('Admin', style: TextStyle(color: Colors.white)),
-              accountEmail: Text('admin@example.com',
-                  style: TextStyle(color: Colors.white)),
-              currentAccountPicture: CircleAvatar(
+            UserAccountsDrawerHeader(
+              accountName:
+                  const Text('Admin', style: TextStyle(color: Colors.white)),
+              accountEmail: Text(
+                _adminEmail ?? 'Email tidak tersedia',
+                style: const TextStyle(color: Colors.white),
+              ),
+              currentAccountPicture: const CircleAvatar(
                 backgroundColor: Colors.white,
                 child: Icon(Icons.person, color: Colors.blueAccent),
               ),
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 gradient: LinearGradient(
                   colors: [Colors.blueAccent, Colors.lightBlue],
                   begin: Alignment.topLeft,

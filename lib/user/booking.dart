@@ -2,8 +2,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
-import 'package:perpustakaan/util/config/config.dart';
-import 'package:perpustakaan/pages/homepage.dart';
+import 'package:e_libs/util/config/config.dart';
+import 'package:e_libs/pages/homepage.dart';
 
 class BookingPage extends StatefulWidget {
   final String nrp;

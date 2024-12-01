@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:perpustakaan/util/config/config.dart'; // Pastikan AppConfig sudah diatur
+import 'package:e_libs/util/config/config.dart'; // Pastikan AppConfig sudah diatur
 
 class PerpanjanganPage extends StatefulWidget {
   final String idBooking;

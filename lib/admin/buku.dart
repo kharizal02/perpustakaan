@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:perpustakaan/util/config/config.dart';
-import 'package:perpustakaan/admin/detail_buku.dart';
+import 'package:e_libs/util/config/config.dart';
+import 'package:e_libs/admin/detail_buku.dart';
 
 class BukuPageAdmin extends StatefulWidget {
   @override
@@ -23,57 +23,53 @@ class _BukuPageAdminState extends State<BukuPageAdmin> {
   }
 
   Future<void> _fetchBooks({String? query}) async {
-  setState(() {
-    _isLoading = true;
-  });
-
-  try {
-    // Menggunakan endpoint utama untuk mendapatkan data buku
-    var uri = Uri.http(AppConfig.API_HOST, '/perpustakaan/buku/get_buku.php', {
-      'query': query ?? '',
+    setState(() {
+      _isLoading = true;
     });
-    final response = await http.get(uri);
 
-    if (response.statusCode == 200) {
-      List<dynamic> books = json.decode(response.body);
-
-      // Sorting gabungan:
-      // 1. Buku dengan status 'tersedia' di atas
-      // 2. Dalam kelompok 'tersedia', urutkan berdasarkan total_peminjaman menurun
-      books.sort((a, b) {
-        // Sorting pertama: berdasarkan status
-        String statusA = a['status'].toLowerCase();
-        String statusB = b['status'].toLowerCase();
-        if (statusA == 'tersedia' && statusB != 'tersedia') {
-          return -1;
-        } else if (statusA != 'tersedia' && statusB == 'tersedia') {
-          return 1;
-        }
-        
-        // Sorting kedua: berdasarkan total_peminjaman
-        int totalPeminjamanA = a['total_peminjaman'] ?? 0;
-        int totalPeminjamanB = b['total_peminjaman'] ?? 0;
-        return totalPeminjamanB.compareTo(totalPeminjamanA); // Descending order
+    try {
+      var uri =
+          Uri.http(AppConfig.API_HOST, '/perpustakaan/buku/get_buku.php', {
+        'query': query ?? '',
       });
+      final response = await http.get(uri);
 
+      if (response.statusCode == 200) {
+        List<dynamic> books = json.decode(response.body);
+
+        books.sort((a, b) {
+          int totalPeminjamanA = a['total_peminjaman'] ?? 0;
+          int totalPeminjamanB = b['total_peminjaman'] ?? 0;
+          if (totalPeminjamanA != totalPeminjamanB) {
+            return totalPeminjamanB.compareTo(totalPeminjamanA);
+          }
+
+          String statusA = a['status'].toLowerCase();
+          String statusB = b['status'].toLowerCase();
+          if (statusA == 'tersedia' && statusB != 'tersedia') {
+            return -1;
+          } else if (statusA != 'tersedia' && statusB == 'tersedia') {
+            return 1;
+          }
+          return 0;
+        });
+
+        setState(() {
+          _books = books;
+          _isLoading = false;
+        });
+      } else {
+        throw Exception('Gagal mengambil data buku');
+      }
+    } catch (e) {
       setState(() {
-        _books = books;
         _isLoading = false;
       });
-    } else {
-      throw Exception('Gagal mengambil data buku');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: $e')),
+      );
     }
-  } catch (e) {
-    setState(() {
-      _isLoading = false;
-    });
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Error: $e')),
-    );
   }
-}
-
-
 
   void _toggleSelectMode() {
     setState(() {
@@ -102,7 +98,7 @@ class _BukuPageAdminState extends State<BukuPageAdmin> {
     );
 
     if (result == true) {
-      _fetchBooks(); // Refresh data jika buku berhasil dihapus
+      _fetchBooks();
     }
   }
 
@@ -139,14 +135,16 @@ class _BukuPageAdminState extends State<BukuPageAdmin> {
               ? Center(child: CircularProgressIndicator())
               : _books.isEmpty
                   ? Center(
-                      child: Text("Tidak ada data buku",
-                          style: TextStyle(fontSize: 18, color: Colors.grey)))
+                      child: Text(
+                        "Tidak ada data buku",
+                        style: TextStyle(fontSize: 18, color: Colors.grey),
+                      ),
+                    )
                   : ListView.builder(
                       itemCount: _books.length,
                       itemBuilder: (context, index) {
                         final book = _books[index];
                         String bookIdStr = book['id_buku'].toString();
-                        bool isSelected = selectedBooks.contains(bookIdStr);
 
                         // Status dan Warna
                         final isAvailable =
@@ -164,14 +162,6 @@ class _BukuPageAdminState extends State<BukuPageAdmin> {
                           margin: const EdgeInsets.symmetric(vertical: 8.0),
                           child: ListTile(
                             contentPadding: const EdgeInsets.all(16),
-                            leading: _isSelectMode
-                                ? Checkbox(
-                                    value: isSelected,
-                                    onChanged: (bool? value) {
-                                      _onBookSelected(book['id_buku']);
-                                    },
-                                  )
-                                : null,
                             title: Text(
                               book['judul_buku'],
                               style: const TextStyle(
@@ -210,16 +200,31 @@ class _BukuPageAdminState extends State<BukuPageAdmin> {
                                 ),
                               ],
                             ),
-                            trailing: Icon(
-                              isAvailable ? Icons.check_circle : Icons.cancel,
-                              color: statusColor,
-                            ),
+                            trailing: book['total_peminjaman'] > 0
+                                ? Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(
+                                        Icons.bookmark,
+                                        size: 18,
+                                        color: Colors.blueGrey,
+                                      ),
+                                      const SizedBox(width: 5),
+                                      Text(
+                                        '${book['total_peminjaman']} ',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.blueGrey,
+                                        ),
+                                      ),
+                                    ],
+                                  )
+                                : null,
                             onTap: () {
                               final bookId = book['id_buku'];
-                              if (!_isSelectMode && bookId != null) {
+                              if (bookId != null) {
                                 _navigateToDetail(bookId.toString());
-                              } else if (_isSelectMode) {
-                                _onBookSelected(book['id_buku']);
                               }
                             },
                           ),

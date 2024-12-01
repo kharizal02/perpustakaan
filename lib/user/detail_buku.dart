@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:perpustakaan/util/config/config.dart';
+import 'package:e_libs/util/config/config.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:perpustakaan/user/booking.dart';
+import 'package:e_libs/user/booking.dart';
 
 class BookDetailPage extends StatefulWidget {
   final String bookId;

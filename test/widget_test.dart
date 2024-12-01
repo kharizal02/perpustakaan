@@ -1,6 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-
-import 'package:perpustakaan/main.dart';
+import 'package:e_libs/main.dart';
 
 void main() {
   testWidgets('Login and Register screen test', (WidgetTester tester) async {

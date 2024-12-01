@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:intl/intl.dart'; // Library untuk format tanggal
-import 'package:perpustakaan/util/config/config.dart'; // Gantilah dengan path yang sesuai
+import 'package:e_libs/util/config/config.dart'; // Gantilah dengan path yang sesuai
 
 class RiwayatBookingPage extends StatefulWidget {
   @override
@@ -220,7 +220,7 @@ class _RiwayatBookingPageState extends State<RiwayatBookingPage> {
                               ),
                               SizedBox(height: 5),
                               Text(
-                                'Tanggal Booking: ${booking['tanggal_booking']}',
+                                'Tanggal Booking: ${DateFormat('yyyy-MM-dd').format(DateTime.parse(booking['tanggal_booking']))}',
                                 style: TextStyle(
                                   fontSize: 14,
                                   color: Colors.grey[600],
@@ -228,7 +228,7 @@ class _RiwayatBookingPageState extends State<RiwayatBookingPage> {
                               ),
                               SizedBox(height: 5),
                               Text(
-                                'Tanggal Kembali: ${booking['tanggal_kembali']}',
+                                'Tanggal Kembali: ${DateFormat('yyyy-MM-dd').format(DateTime.parse(booking['tanggal_kembali']))}',
                                 style: TextStyle(
                                   fontSize: 14,
                                   color: Colors.grey[600],

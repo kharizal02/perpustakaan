@@ -1,13 +1,12 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:perpustakaan/util/config/config.dart';
+import 'package:e_libs/util/config/config.dart';
 
 class MahasiswaPage extends StatefulWidget {
   final Map<String, dynamic>? mahasiswaDetail;
 
-  MahasiswaPage(
-      {this.mahasiswaDetail}); // Konstruktor dengan parameter opsional
+  MahasiswaPage({this.mahasiswaDetail}); // Constructor with optional parameter
 
   @override
   _MahasiswaPageState createState() => _MahasiswaPageState();
@@ -18,13 +17,32 @@ class _MahasiswaPageState extends State<MahasiswaPage> {
   List<Map<String, dynamic>> _filteredMahasiswaList = [];
   final TextEditingController _searchController = TextEditingController();
 
+  // Controllers for editing student details
+  TextEditingController _namaController = TextEditingController();
+  TextEditingController _nrpController = TextEditingController();
+  TextEditingController _prodiController = TextEditingController();
+  TextEditingController _semesterController = TextEditingController();
+  TextEditingController _tglLahirController = TextEditingController();
+
+  // Variable for status (Aktif/Tidak Aktif)
+  String _status = 'Aktif';
+
   @override
   void initState() {
     super.initState();
-    _fetchMahasiswaData(); // Ambil data mahasiswa dari API saat halaman dimuat
+    if (widget.mahasiswaDetail != null) {
+      // Initialize controllers with existing data if viewing a student's details
+      _namaController.text = widget.mahasiswaDetail!['nama'];
+      _nrpController.text = widget.mahasiswaDetail!['nrp'].toString();
+      _prodiController.text = widget.mahasiswaDetail!['prodi'];
+      _semesterController.text = widget.mahasiswaDetail!['semester'].toString();
+      _status = widget.mahasiswaDetail!['status']; // Set the existing status
+      _tglLahirController.text = widget.mahasiswaDetail!['tgl_lahir'];
+    }
+    _fetchMahasiswaData(); // Fetch student data from API when the page loads
   }
 
-  // Fungsi untuk mengambil data mahasiswa dari API
+  // Function to fetch student data from the API
   Future<void> _fetchMahasiswaData() async {
     var uri = Uri.http(
         AppConfig.API_HOST, '/perpustakaan/mahasiswa/get_mahasiswa.php');
@@ -34,23 +52,20 @@ class _MahasiswaPageState extends State<MahasiswaPage> {
       final data = json.decode(response.body);
       if (data['status'] == 'success') {
         setState(() {
-          // Ambil seluruh data mahasiswa
           _mahasiswaList = List<Map<String, dynamic>>.from(data['data']);
-          _filteredMahasiswaList =
-              _mahasiswaList; // Awalnya tampilkan semua mahasiswa
+          _filteredMahasiswaList = _mahasiswaList;
         });
       } else {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content:
-                Text(data['message'] ?? 'Gagal mengambil data mahasiswa.')));
+            content: Text(data['message'] ?? 'Failed to fetch student data.')));
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Gagal mengambil data dari server.')));
+          SnackBar(content: Text('Failed to fetch data from server.')));
     }
   }
 
-  // Fungsi untuk memfilter daftar mahasiswa berdasarkan pencarian
+  // Function to filter student list based on search
   void _filterMahasiswaList(String query) {
     setState(() {
       _filteredMahasiswaList = _mahasiswaList
@@ -61,12 +76,63 @@ class _MahasiswaPageState extends State<MahasiswaPage> {
     });
   }
 
-  // Widget untuk menampilkan detail mahasiswa
+  Future<void> _updateMahasiswa() async {
+    var uri = Uri.http(
+        AppConfig.API_HOST, '/perpustakaan/mahasiswa/update_mahasiswa.php');
+    final response = await http.post(uri, body: {
+      'id_mahasiswa': widget.mahasiswaDetail!['id_mahasiswa'].toString(),
+      'nama': _namaController.text,
+      'nrp': _nrpController.text,
+      'prodi': _prodiController.text,
+      'semester': _semesterController.text,
+      'status': _status, // Send the updated status
+      'tgl_lahir': _tglLahirController.text,
+    });
+
+    final data = json.decode(response.body);
+    if (data['status'] == 'success') {
+      // Update local data for the detailed student view
+      setState(() {
+        widget.mahasiswaDetail!['nama'] = _namaController.text;
+        widget.mahasiswaDetail!['nrp'] = _nrpController.text;
+        widget.mahasiswaDetail!['prodi'] = _prodiController.text;
+        widget.mahasiswaDetail!['semester'] = _semesterController.text;
+        widget.mahasiswaDetail!['status'] = _status;
+        widget.mahasiswaDetail!['tgl_lahir'] = _tglLahirController.text;
+      });
+
+      // Close the dialog and show success feedback
+      Navigator.pop(context); // Close the dialog
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Berhasil'),
+            content: Text('Data mahasiswa berhasil diperbarui.'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context); // Close the success dialog
+                },
+                child: Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+    } else {
+      // Show failure feedback
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Gagal memperbarui data mahasiswa.')));
+    }
+  }
+
+  // Widget to display student details
   Widget _buildMahasiswaDetail(Map<String, dynamic> mahasiswa) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Color(0xFF42A5F5),
-        title: Text('Detail Mahasiswa'),
+        title: Text('Student Details'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -93,6 +159,11 @@ class _MahasiswaPageState extends State<MahasiswaPage> {
                 _buildDetailRow('Semester', mahasiswa['semester'].toString()),
                 _buildDetailRow('Status', mahasiswa['status']),
                 _buildDetailRow('Tanggal Lahir', mahasiswa['tgl_lahir']),
+                SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: _showUpdateDialog,
+                  child: Text('Update Student'),
+                ),
               ],
             ),
           ),
@@ -101,7 +172,7 @@ class _MahasiswaPageState extends State<MahasiswaPage> {
     );
   }
 
-  // Helper widget untuk membuat baris detail
+  // Helper widget to create each row in student details
   Widget _buildDetailRow(String label, String value) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -119,14 +190,151 @@ class _MahasiswaPageState extends State<MahasiswaPage> {
     );
   }
 
+  void _showUpdateDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: Text('Update Status Mahasiswa'),
+              content: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Nama (readonly)
+                    _buildReadOnlyTextField(_namaController, 'Nama'),
+
+                    // NRP (readonly)
+                    _buildReadOnlyTextField(_nrpController, 'NRP'),
+
+                    // Program Studi (readonly)
+                    _buildReadOnlyTextField(_prodiController, 'Program Studi'),
+
+                    // Semester (readonly)
+                    _buildReadOnlyTextField(_semesterController, 'Semester'),
+
+                    // Tanggal Lahir (readonly)
+                    _buildReadOnlyTextField(
+                        _tglLahirController, 'Tanggal Lahir'),
+
+                    // Pilihan Status (Aktif/Tidak Aktif)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text('Status',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.grey[800])),
+                          Row(
+                            children: [
+                              // Aktif Status Button
+                              _buildStatusButton(
+                                  context: context,
+                                  text: 'Aktif',
+                                  isSelected: _status == 'Aktif',
+                                  onPressed: () {
+                                    setState(() {
+                                      _status = 'Aktif';
+                                    });
+                                  }),
+                              SizedBox(width: 10),
+                              // Tidak Aktif Status Button
+                              _buildStatusButton(
+                                  context: context,
+                                  text: 'Tidak Aktif',
+                                  isSelected: _status == 'Tidak Aktif',
+                                  onPressed: () {
+                                    setState(() {
+                                      _status = 'Tidak Aktif';
+                                    });
+                                  }),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context); // Tutup dialog jika cancel
+                  },
+                  child: Text('Cancel'),
+                ),
+                ElevatedButton(
+                  onPressed: _updateMahasiswa,
+                  child: Text('Update'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+// Helper method to create consistent status buttons
+  Widget _buildStatusButton({
+    required BuildContext context,
+    required String text,
+    required bool isSelected,
+    required VoidCallback onPressed,
+  }) {
+    return ElevatedButton(
+      onPressed: onPressed,
+      style: ElevatedButton.styleFrom(
+        backgroundColor:
+            isSelected ? Theme.of(context).primaryColor : Colors.grey[300],
+        foregroundColor: isSelected ? Colors.white : Colors.black,
+      ),
+      child: Text(text),
+    );
+  }
+
+// Helper widget untuk menampilkan field yang tidak bisa diubah
+  Widget _buildReadOnlyTextField(
+      TextEditingController controller, String label) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: TextField(
+        controller: controller,
+        decoration: InputDecoration(
+          labelText: label,
+          border: OutlineInputBorder(),
+        ),
+        enabled:
+            false, // Menandakan bahwa field ini hanya bisa ditampilkan, tidak bisa diubah
+      ),
+    );
+  }
+
+  // Helper widget to create text fields
+  Widget _buildTextField(TextEditingController controller, String label) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: TextField(
+        controller: controller,
+        decoration: InputDecoration(
+          labelText: label,
+          border: OutlineInputBorder(),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    // Jika detail mahasiswa sudah diberikan, tampilkan detail
+    // If student details are provided, show the details screen
     if (widget.mahasiswaDetail != null) {
       return _buildMahasiswaDetail(widget.mahasiswaDetail!);
     }
 
-    // Jika tidak, tampilkan daftar mahasiswa
+    // If no details, show the student list
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.blueAccent,
@@ -153,70 +361,62 @@ class _MahasiswaPageState extends State<MahasiswaPage> {
           ),
         ),
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: ListView.builder(
-              itemCount: _filteredMahasiswaList.length,
-              itemBuilder: (context, index) {
-                final mahasiswa = _filteredMahasiswaList[index];
-                return Padding(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 8.0, vertical: 4.0),
-                  child: InkWell(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              MahasiswaPage(mahasiswaDetail: mahasiswa),
-                        ),
-                      );
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.all(16.0),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(8.0),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey.withOpacity(0.5),
-                            spreadRadius: 2,
-                            blurRadius: 5,
-                            offset: Offset(0, 3),
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            mahasiswa['nama'],
-                            style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.blue[800]),
-                          ),
-                          SizedBox(height: 4),
-                          Text(
-                            'NRP: ${mahasiswa['nrp']}',
-                            style: TextStyle(
-                                fontSize: 14, color: Colors.grey[600]),
-                          ),
-                          Text(
-                            'Prodi: ${mahasiswa['prodi']}',
-                            style: TextStyle(
-                                fontSize: 14, color: Colors.grey[600]),
-                          ),
-                        ],
-                      ),
+      body: ListView.builder(
+        itemCount: _filteredMahasiswaList.length,
+        itemBuilder: (context, index) {
+          final mahasiswa = _filteredMahasiswaList[index];
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+            child: InkWell(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => MahasiswaPage(
+                      mahasiswaDetail: mahasiswa,
                     ),
                   ),
                 );
               },
+              child: Container(
+                padding: const EdgeInsets.all(16.0),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(8.0),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.5),
+                      spreadRadius: 2,
+                      blurRadius: 5,
+                      offset: Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      mahasiswa['nama'],
+                      style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.blue[800]),
+                    ),
+                    SizedBox(height: 4),
+                    Text(
+                      'NRP: ${mahasiswa['nrp']}',
+                      style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                    ),
+                    Text(
+                      'Prodi: ${mahasiswa['prodi']}',
+                      style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                    ),
+                  ],
+                ),
+              ),
             ),
-          ),
-        ],
+          );
+        },
       ),
     );
   }

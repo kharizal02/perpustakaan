@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:perpustakaan/util/config/config.dart';
+import 'package:e_libs/util/config/config.dart';
 
 class PerpanjanganPage extends StatefulWidget {
   @override
@@ -92,6 +92,36 @@ class _PerpanjanganPageState extends State<PerpanjanganPage> {
           }
         } else {
           _showErrorDialog('Gagal memperbarui tanggal pengembalian.');
+        }
+      } else {
+        _showErrorDialog('Gagal menghubungi server.');
+      }
+    } catch (e) {
+      _showErrorDialog('Terjadi kesalahan: $e');
+    }
+  }
+
+  // Fungsi untuk menolak perpanjangan dan mengirimkan notifikasi
+  Future<void> _tolakPerpanjangan(String idBooking) async {
+    try {
+      var uri = Uri.http(
+          AppConfig.API_HOST, '/perpustakaan/booking/reject_perpanjangan.php');
+      final response = await http.post(uri, body: {
+        'id_booking': idBooking,
+      });
+
+      if (response.statusCode == 200) {
+        var data = json.decode(response.body);
+
+        if (data['status'] == 'success') {
+          setState(() {
+            // Hapus permintaan perpanjangan yang ditolak dari daftar
+            perpanjanganData
+                .removeWhere((item) => item['id_booking'] == idBooking);
+          });
+          _showSuccessDialog('Permintaan perpanjangan telah ditolak.');
+        } else {
+          _showErrorDialog('Gagal menolak permintaan perpanjangan.');
         }
       } else {
         _showErrorDialog('Gagal menghubungi server.');
@@ -226,6 +256,22 @@ class _PerpanjanganPageState extends State<PerpanjanganPage> {
                                       ),
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor: Colors.blue,
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 20),
+                                      ),
+                                    ),
+                                    ElevatedButton(
+                                      onPressed: () {
+                                        _tolakPerpanjangan(
+                                          perpanjangan['id_booking'].toString(),
+                                        );
+                                      },
+                                      child: Text(
+                                        'Tolak',
+                                        style: TextStyle(color: Colors.white),
+                                      ),
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.red,
                                         padding: EdgeInsets.symmetric(
                                             horizontal: 20),
                                       ),

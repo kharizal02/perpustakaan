@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:perpustakaan/util/config/config.dart';
+import 'package:e_libs/util/config/config.dart';
 
 class BookComparisonPage extends StatefulWidget {
   final List<String> bookIds; // Menerima daftar ID buku yang dipilih
@@ -59,23 +59,6 @@ class _BookComparisonPageState extends State<BookComparisonPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Gambar Sampul Buku
-                Container(
-                  height: 200,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(15),
-                    image: DecorationImage(
-                      image: NetworkImage(
-                        book['gambar_sampul'] != null
-                            ? book['gambar_sampul']
-                            : 'https://via.placeholder.com/150',
-                      ),
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-
                 // Judul Buku
                 Text(
                   book['judul_buku'],

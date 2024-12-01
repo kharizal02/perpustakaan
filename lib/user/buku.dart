@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:perpustakaan/util/config/config.dart';
-import 'package:perpustakaan/user/detail_buku.dart';
-import 'package:perpustakaan/user/bandingkan_buku.dart';
+import 'package:e_libs/util/config/config.dart';
+import 'package:e_libs/user/detail_buku.dart';
+import 'package:e_libs/user/bandingkan_buku.dart';
 
 class BukuPage extends StatefulWidget {
   @override
@@ -23,48 +23,54 @@ class _BukuPageState extends State<BukuPage> {
     _fetchBooks();
   }
 
-   Future<void> _fetchBooks({String? query}) async {
-  setState(() {
-    _isLoading = true;
-  });
-
-  try {
-    var uri = Uri.http(AppConfig.API_HOST, '/perpustakaan/buku/get_buku.php', {
-      'query': query ?? '',
+  Future<void> _fetchBooks({String? query}) async {
+    setState(() {
+      _isLoading = true;
     });
-    final response = await http.get(uri);
 
-    if (response.statusCode == 200) {
-      List<dynamic> books = json.decode(response.body);
-
-      // Sorting books: 'tersedia' di atas, lainnya di bawah
-      books.sort((a, b) {
-        String statusA = a['status'].toLowerCase();
-        String statusB = b['status'].toLowerCase();
-        if (statusA == 'tersedia' && statusB != 'tersedia') {
-          return -1; // 'tersedia' lebih tinggi
-        } else if (statusA != 'tersedia' && statusB == 'tersedia') {
-          return 1; // 'dipinjam' lebih rendah
-        }
-        return 0; // status sama, tidak diubah
+    try {
+      var uri =
+          Uri.http(AppConfig.API_HOST, '/perpustakaan/buku/get_buku.php', {
+        'query': query ?? '',
       });
+      final response = await http.get(uri);
 
+      if (response.statusCode == 200) {
+        List<dynamic> books = json.decode(response.body);
+
+        books.sort((a, b) {
+          int totalPeminjamanA = a['total_peminjaman'] ?? 0;
+          int totalPeminjamanB = b['total_peminjaman'] ?? 0;
+          if (totalPeminjamanA != totalPeminjamanB) {
+            return totalPeminjamanB.compareTo(totalPeminjamanA);
+          }
+
+          String statusA = a['status'].toLowerCase();
+          String statusB = b['status'].toLowerCase();
+          if (statusA == 'tersedia' && statusB != 'tersedia') {
+            return -1;
+          } else if (statusA != 'tersedia' && statusB == 'tersedia') {
+            return 1;
+          }
+          return 0;
+        });
+
+        setState(() {
+          _books = books;
+          _isLoading = false;
+        });
+      } else {
+        throw Exception('Gagal mengambil data buku');
+      }
+    } catch (e) {
       setState(() {
-        _books = books;
         _isLoading = false;
       });
-    } else {
-      throw Exception('Gagal mengambil data buku');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: $e')),
+      );
     }
-  } catch (e) {
-    setState(() {
-      _isLoading = false;
-    });
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Error: $e')),
-    );
   }
-}
 
   void _toggleSelectMode() {
     setState(() {
@@ -210,10 +216,27 @@ class _BukuPageState extends State<BukuPage> {
                                 ),
                               ],
                             ),
-                            trailing: Icon(
-                              isAvailable ? Icons.check_circle : Icons.cancel,
-                              color: statusColor,
-                            ),
+                            trailing: book['total_peminjaman'] > 0
+                                ? Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(
+                                        Icons.bookmark,
+                                        size: 18,
+                                        color: Colors.blueGrey,
+                                      ),
+                                      const SizedBox(width: 5),
+                                      Text(
+                                        '${book['total_peminjaman']}',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.blueGrey,
+                                        ),
+                                      ),
+                                    ],
+                                  )
+                                : null,
                             onTap: () {
                               final bookId = book['id_buku'];
                               if (!_isSelectMode && bookId != null) {

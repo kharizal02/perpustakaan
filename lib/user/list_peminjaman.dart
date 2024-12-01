@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:perpustakaan/util/config/config.dart';
+import 'package:e_libs/util/config/config.dart';
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:perpustakaan/user/perpanjangan.dart';
+import 'package:e_libs/user/perpanjangan.dart';
 
 class ListPeminjamanPage extends StatefulWidget {
   @override

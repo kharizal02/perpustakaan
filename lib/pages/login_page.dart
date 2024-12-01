@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:perpustakaan/util/config/config.dart';
+import 'package:e_libs/util/config/config.dart';
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -18,13 +18,76 @@ class _LoginPageState extends State<LoginPage> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
     await prefs.setString('role', userData['role']);
-    await prefs.setString('email', userData['email']);
 
-    if (userData['role'] == 'user') {
+    if (userData['role'] == 'admin') {
+      await prefs.setString('email', userData['email']);
+    } else if (userData['role'] == 'user') {
       await prefs.setString('nrp', userData['nrp']);
       await prefs.setString('nama', userData['nama']);
       await prefs.setString('prodi', userData['prodi']);
     }
+  }
+
+  Future<void> fetchNotifikasi(String idMahasiswa) async {
+    try {
+      var uri = Uri.http(
+          AppConfig.API_HOST, '/perpustakaan/booking/get_notifikasi.php', {
+        'id_mahasiswa': idMahasiswa,
+      });
+      var response = await http.get(uri);
+
+      var data = json.decode(response.body);
+
+      if (data['status'] == 'success') {
+        // Menampilkan notifikasi
+        List notifikasi = data['data'];
+        _showNotifikasiDialog(notifikasi);
+      } else {
+        _showErrorDialog(data['message']);
+      }
+    } catch (e) {
+      _showErrorDialog('Terjadi kesalahan: $e');
+    }
+  }
+
+  void _showNotifikasiDialog(List notifikasi) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text('Notifikasi'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: notifikasi.map<Widget>((notif) {
+            return ListTile(
+              title: Text(notif['pesan']),
+              subtitle: Text(notif['created_at']),
+            );
+          }).toList(),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text('Error', style: TextStyle(color: Colors.red)),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text('OK', style: TextStyle(color: Colors.blue)),
+          ),
+        ],
+      ),
+    );
   }
 
   Future<void> _login() async {

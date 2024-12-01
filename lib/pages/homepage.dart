@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:perpustakaan/user/buku.dart';
-import 'package:perpustakaan/user/list_peminjaman.dart';
+import 'package:e_libs/user/buku.dart';
+import 'package:e_libs/user/list_peminjaman.dart';
 
 void main() {
   runApp(MyApp());
