@@ -12,6 +12,7 @@ class _RegisterPageState extends State<RegisterPage> {
   final TextEditingController _nrpController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  // ignore: unused_field
   String _message = '';
 
   Future<void> _register() async {

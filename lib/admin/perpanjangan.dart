@@ -101,13 +101,44 @@ class _PerpanjanganPageState extends State<PerpanjanganPage> {
     }
   }
 
-  // Fungsi untuk menolak perpanjangan dan mengirimkan notifikasi
   Future<void> _tolakPerpanjangan(String idBooking) async {
+    TextEditingController alasanController = TextEditingController();
+
+    // Tampilkan dialog untuk meminta alasan
+    await showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text('Tolak Perpanjangan'),
+        content: TextField(
+          controller: alasanController,
+          decoration: InputDecoration(
+            hintText: 'Masukkan alasan penolakan',
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text('Batal'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text('Kirim'),
+          ),
+        ],
+      ),
+    );
+
+    if (alasanController.text.isEmpty) {
+      _showErrorDialog('Alasan tidak boleh kosong.');
+      return;
+    }
+
     try {
       var uri = Uri.http(
           AppConfig.API_HOST, '/perpustakaan/booking/reject_perpanjangan.php');
       final response = await http.post(uri, body: {
         'id_booking': idBooking,
+        'alasan': alasanController.text, // Kirim alasan
       });
 
       if (response.statusCode == 200) {
@@ -115,13 +146,12 @@ class _PerpanjanganPageState extends State<PerpanjanganPage> {
 
         if (data['status'] == 'success') {
           setState(() {
-            // Hapus permintaan perpanjangan yang ditolak dari daftar
             perpanjanganData
                 .removeWhere((item) => item['id_booking'] == idBooking);
           });
           _showSuccessDialog('Permintaan perpanjangan telah ditolak.');
         } else {
-          _showErrorDialog('Gagal menolak permintaan perpanjangan.');
+          _showErrorDialog(data['message']);
         }
       } else {
         _showErrorDialog('Gagal menghubungi server.');

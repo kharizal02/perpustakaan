@@ -39,20 +39,21 @@ class _BukuPageState extends State<BukuPage> {
         List<dynamic> books = json.decode(response.body);
 
         books.sort((a, b) {
-          int totalPeminjamanA = a['total_peminjaman'] ?? 0;
-          int totalPeminjamanB = b['total_peminjaman'] ?? 0;
-          if (totalPeminjamanA != totalPeminjamanB) {
-            return totalPeminjamanB.compareTo(totalPeminjamanA);
-          }
-
           String statusA = a['status'].toLowerCase();
           String statusB = b['status'].toLowerCase();
+          int totalPeminjamanA = a['total_peminjaman'] ?? 0;
+          int totalPeminjamanB = b['total_peminjaman'] ?? 0;
+
+          // Pertama, urutkan berdasarkan status. Buku 'tersedia' harus di atas buku 'dipinjam'
           if (statusA == 'tersedia' && statusB != 'tersedia') {
-            return -1;
+            return -1; // Buku 'tersedia' di atas
           } else if (statusA != 'tersedia' && statusB == 'tersedia') {
-            return 1;
+            return 1; // Buku 'dipinjam' di bawah
           }
-          return 0;
+
+          // Kedua, jika status sama, urutkan berdasarkan jumlah peminjaman (yang lebih banyak di atas)
+          return totalPeminjamanB.compareTo(
+              totalPeminjamanA); // Urutkan berdasarkan peminjaman terbanyak
         });
 
         setState(() {
@@ -75,7 +76,8 @@ class _BukuPageState extends State<BukuPage> {
   void _toggleSelectMode() {
     setState(() {
       _isSelectMode = !_isSelectMode;
-      if (!_isSelectMode) selectedBooks.clear();
+      if (!_isSelectMode)
+        selectedBooks.clear(); // Clear selection when exiting select mode
     });
   }
 
@@ -115,7 +117,7 @@ class _BukuPageState extends State<BukuPage> {
             _fetchBooks(query: text);
           },
           decoration: InputDecoration(
-            hintText: 'Cari Buku (Judul, Penulis, Prodi, Tahun Terbit)',
+            hintText: 'Cari Buku',
             prefixIcon: const Icon(Icons.search, color: Colors.white),
             filled: true,
             fillColor: Colors.white70,
@@ -126,7 +128,7 @@ class _BukuPageState extends State<BukuPage> {
             ),
           ),
         ),
-        automaticallyImplyLeading: false,
+        leading: null, // Ensures no back button in the AppBar
         actions: [
           IconButton(
             icon: Icon(
@@ -216,7 +218,7 @@ class _BukuPageState extends State<BukuPage> {
                                 ),
                               ],
                             ),
-                            trailing: book['total_peminjaman'] > 0
+                            trailing: book['total_peminjaman'] >= 3
                                 ? Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [

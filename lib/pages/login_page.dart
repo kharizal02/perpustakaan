@@ -12,82 +12,29 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  String _message = '';
 
   Future<void> _saveUserData(Map<String, dynamic> userData) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
+    // Simpan data role
     await prefs.setString('role', userData['role']);
 
+    // Simpan data user
     if (userData['role'] == 'admin') {
       await prefs.setString('email', userData['email']);
     } else if (userData['role'] == 'user') {
       await prefs.setString('nrp', userData['nrp']);
       await prefs.setString('nama', userData['nama']);
       await prefs.setString('prodi', userData['prodi']);
-    }
-  }
 
-  Future<void> fetchNotifikasi(String idMahasiswa) async {
-    try {
-      var uri = Uri.http(
-          AppConfig.API_HOST, '/perpustakaan/booking/get_notifikasi.php', {
-        'id_mahasiswa': idMahasiswa,
-      });
-      var response = await http.get(uri);
-
-      var data = json.decode(response.body);
-
-      if (data['status'] == 'success') {
-        // Menampilkan notifikasi
-        List notifikasi = data['data'];
-        _showNotifikasiDialog(notifikasi);
+      // Simpan notifikasi sebagai string JSON
+      if (userData['notifikasi'] != null) {
+        await prefs.setString(
+            'notifikasi', json.encode(userData['notifikasi']));
       } else {
-        _showErrorDialog(data['message']);
+        await prefs.remove('notifikasi'); // Hapus jika tidak ada notifikasi
       }
-    } catch (e) {
-      _showErrorDialog('Terjadi kesalahan: $e');
     }
-  }
-
-  void _showNotifikasiDialog(List notifikasi) {
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text('Notifikasi'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: notifikasi.map<Widget>((notif) {
-            return ListTile(
-              title: Text(notif['pesan']),
-              subtitle: Text(notif['created_at']),
-            );
-          }).toList(),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: Text('OK'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showErrorDialog(String message) {
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text('Error', style: TextStyle(color: Colors.red)),
-        content: Text(message),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: Text('OK', style: TextStyle(color: Colors.blue)),
-          ),
-        ],
-      ),
-    );
   }
 
   Future<void> _login() async {
@@ -107,53 +54,38 @@ class _LoginPageState extends State<LoginPage> {
         if (data['success']) {
           await _saveUserData(data['data']);
           String role = data['data']['role'];
+
           if (role == 'admin') {
             Navigator.pushReplacementNamed(context, '/homepageAdmin');
           } else if (role == 'user') {
             Navigator.pushReplacementNamed(context, '/tata_tertib');
           }
         } else {
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return AlertDialog(
-                title: const Text('Login Failed'),
-                content: Text(data['message']),
-                actions: [
-                  TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    child: const Text('OK'),
-                  ),
-                ],
-              );
-            },
-          );
+          _showErrorDialog(data['message']);
         }
       } else {
         throw Exception('Failed to load, status: ${response.statusCode}');
       }
     } catch (e) {
-      print("Login error: $e");
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text('Login Error'),
-            content: Text(e.toString()),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: const Text('OK'),
-              ),
-            ],
-          );
-        },
-      );
+      _showErrorDialog('Login error: $e');
     }
+  }
+
+  /// Tampilkan dialog error
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text('Error', style: TextStyle(color: Colors.red)),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text('OK', style: TextStyle(color: Colors.blue)),
+          ),
+        ],
+      ),
+    );
   }
 
   @override

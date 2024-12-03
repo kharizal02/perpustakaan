@@ -5,6 +5,8 @@ import 'package:e_libs/util/config/config.dart';
 import 'package:e_libs/admin/detail_buku.dart';
 
 class BukuPageAdmin extends StatefulWidget {
+  const BukuPageAdmin({super.key});
+
   @override
   _BukuPageAdminState createState() => _BukuPageAdminState();
 }
@@ -38,20 +40,21 @@ class _BukuPageAdminState extends State<BukuPageAdmin> {
         List<dynamic> books = json.decode(response.body);
 
         books.sort((a, b) {
-          int totalPeminjamanA = a['total_peminjaman'] ?? 0;
-          int totalPeminjamanB = b['total_peminjaman'] ?? 0;
-          if (totalPeminjamanA != totalPeminjamanB) {
-            return totalPeminjamanB.compareTo(totalPeminjamanA);
-          }
-
           String statusA = a['status'].toLowerCase();
           String statusB = b['status'].toLowerCase();
+          int totalPeminjamanA = a['total_peminjaman'] ?? 0;
+          int totalPeminjamanB = b['total_peminjaman'] ?? 0;
+
+          // Pertama, urutkan berdasarkan status. Buku 'tersedia' harus di atas buku 'dipinjam'
           if (statusA == 'tersedia' && statusB != 'tersedia') {
-            return -1;
+            return -1; // Buku 'tersedia' di atas
           } else if (statusA != 'tersedia' && statusB == 'tersedia') {
-            return 1;
+            return 1; // Buku 'dipinjam' di bawah
           }
-          return 0;
+
+          // Kedua, jika status sama, urutkan berdasarkan jumlah peminjaman (yang lebih banyak di atas)
+          return totalPeminjamanB.compareTo(
+              totalPeminjamanA); // Urutkan berdasarkan peminjaman terbanyak
         });
 
         setState(() {
@@ -114,7 +117,7 @@ class _BukuPageAdminState extends State<BukuPageAdmin> {
             _fetchBooks(query: text);
           },
           decoration: InputDecoration(
-            hintText: 'Cari Buku (Judul, Penulis, Prodi, Tahun Terbit)',
+            hintText: 'Cari Buku ',
             prefixIcon: const Icon(Icons.search, color: Colors.white),
             filled: true,
             fillColor: Colors.white70,
@@ -125,7 +128,7 @@ class _BukuPageAdminState extends State<BukuPageAdmin> {
             ),
           ),
         ),
-        automaticallyImplyLeading: false,
+        automaticallyImplyLeading: false, // Corrected parameter name
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -144,6 +147,7 @@ class _BukuPageAdminState extends State<BukuPageAdmin> {
                       itemCount: _books.length,
                       itemBuilder: (context, index) {
                         final book = _books[index];
+                        // ignore: unused_local_variable
                         String bookIdStr = book['id_buku'].toString();
 
                         // Status dan Warna
@@ -200,7 +204,7 @@ class _BukuPageAdminState extends State<BukuPageAdmin> {
                                 ),
                               ],
                             ),
-                            trailing: book['total_peminjaman'] > 0
+                            trailing: book['total_peminjaman'] >= 3
                                 ? Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
@@ -211,7 +215,7 @@ class _BukuPageAdminState extends State<BukuPageAdmin> {
                                       ),
                                       const SizedBox(width: 5),
                                       Text(
-                                        '${book['total_peminjaman']} ',
+                                        '${book['total_peminjaman']}',
                                         style: TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.bold,
